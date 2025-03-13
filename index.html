@@ -4,11 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payments | Your Chapter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h2, h3 {
+            color: #003366;
+        }
+        button {
+            background-color: #0070ba;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #005ea6;
+        }
+        input, select {
+            margin: 5px;
+            padding: 8px;
+            width: 90%;
+        }
+        #cart-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ccc;
+            font-size: 14px;
+            color: #666;
+        }
+        .paypal-button {
+            margin-top: 20px;
+        }
+        .logo {
+            max-width: 200px;
+            margin-bottom: 20px;
+        }
+    </style>
     <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=USD"></script>
     <script>
         let cart = [];
 
         function addToCart(name, price, details) {
+            if (parseFloat(price) < 0) {
+                alert("Donation amount cannot be negative.");
+                return;
+            }
             cart.push({ name, price, details });
             updateCartDisplay();
         }
@@ -16,7 +70,7 @@
         function updateCartDisplay() {
             let cartHtml = "";
             let total = 0;
-            cart.forEach((item, index) => {
+            cart.forEach((item) => {
                 total += parseFloat(item.price);
                 cartHtml += `<li>${item.name} - $${item.price} <br> ${item.details}</li>`;
             });
@@ -45,6 +99,7 @@
     </script>
 </head>
 <body>
+    <img src="https://github.com/joshholmes7/SCAHEAD-PayPal-Payments/blob/main/SC%20AHEAD%20Logo%20Color%202024.png?raw=true" alt="Organization Logo" class="logo">
     <h2>Support Our Chapter</h2>
     <p>Select the items you want to purchase and proceed to checkout.</p>
 
@@ -75,8 +130,14 @@
     <ul id="cart-list"></ul>
     <p id="total-price">Total: $0.00</p>
     
-    <div id="paypal-button-container"></div>
+    <div id="paypal-button-container" class="paypal-button"></div>
     <script>renderPayPalButtons();</script>
+
+    <footer>
+        <p>Contact Treasurer: treasurer@yourchapter.org</p>
+        <p>Mail payments to:<br>SC AHEAD Treasurer<br>Joshua Holmes<br>131 Community College Dr<br>Spartanburg, SC 29303</p>
+    </footer>
 </body>
 </html>
+
 
