@@ -18,27 +18,6 @@
         h2, h3 {
             color: #003366;
         }
-        button {
-            background-color: #0070ba;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        button:hover {
-            background-color: #005ea6;
-        }
-        input, select {
-            margin: 5px;
-            padding: 8px;
-            width: 90%;
-        }
-        #cart-list {
-            list-style-type: none;
-            padding: 0;
-        }
         footer {
             margin-top: 30px;
             padding-top: 20px;
@@ -46,98 +25,52 @@
             font-size: 14px;
             color: #666;
         }
-        .paypal-button {
-            margin-top: 20px;
-        }
         .logo {
             max-width: 200px;
             margin-bottom: 20px;
         }
     </style>
-    <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=USD"></script>
-    <script>
-        let cart = [];
-
-        function addToCart(name, price, details) {
-            if (parseFloat(price) < 0) {
-                alert("Donation amount cannot be negative.");
-                return;
-            }
-            cart.push({ name, price, details });
-            updateCartDisplay();
-        }
-
-        function updateCartDisplay() {
-            let cartHtml = "";
-            let total = 0;
-            cart.forEach((item) => {
-                total += parseFloat(item.price);
-                cartHtml += `<li>${item.name} - $${item.price} <br> ${item.details}</li>`;
-            });
-            document.getElementById("cart-list").innerHTML = cartHtml;
-            document.getElementById("total-price").innerText = `Total: $${total.toFixed(2)}`;
-        }
-
-        function renderPayPalButtons() {
-            paypal.Buttons({
-                createOrder: function(data, actions) {
-                    return actions.order.create({
-                        purchase_units: [{
-                            amount: {
-                                value: cart.reduce((sum, item) => sum + parseFloat(item.price), 0).toFixed(2)
-                            }
-                        }]
-                    });
-                },
-                onApprove: function(data, actions) {
-                    return actions.order.capture().then(function(details) {
-                        alert('Payment successful! Thank you, ' + details.payer.name.given_name);
-                    });
-                }
-            }).render('#paypal-button-container');
-        }
-    </script>
 </head>
 <body>
     <img src="https://github.com/joshholmes7/SCAHEAD-PayPal-Payments/blob/main/SC%20AHEAD%20Logo%20Color%202024.png?raw=true" alt="Organization Logo" class="logo">
-    <h2>Support Our Chapter</h2>
+    <h2>Payment Portal for SC AHEAD</h2>
     <p>Select the items you want to purchase and proceed to checkout.</p>
 
     <h3>Conference Registration</h3>
-    <select id="conference-type">
-        <option value="25">Individual Member - $25</option>
-        <option value="35">Individual Non-Member - $35</option>
-    </select>
-    <input type="text" id="conference-name" placeholder="Name(s) being paid for" />
-    <input type="text" id="conference-institution" placeholder="Institution Represented" />
-    <button onclick="addToCart('Conference Registration', document.getElementById('conference-type').value, `Name: ${document.getElementById('conference-name').value}, Institution: ${document.getElementById('conference-institution').value}`)">Add to Cart</button>
+    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+        <input type="hidden" name="cmd" value="_s-xclick">
+        <input type="hidden" name="hosted_button_id" value="F3D65M8P8Y4KA">
+        <input type="submit" value="Register Now" style="background-color:#0070ba; color:white; padding:10px 15px; border:none; border-radius:5px; cursor:pointer;">
+    </form>
     
     <h3>Individual Membership ($50)</h3>
-    <select id="membership-year">
-        <option value="50">24-25</option>
-        <option value="50">25-26</option>
-        <option value="50">26-27</option>
-    </select>
-    <input type="text" id="membership-name" placeholder="Name(s) being paid for" />
-    <input type="text" id="membership-institution" placeholder="Institution Represented" />
-    <button onclick="addToCart('Individual Membership', 50, `Year: ${document.getElementById('membership-year').value}, Name: ${document.getElementById('membership-name').value}, Institution: ${document.getElementById('membership-institution').value}`)">Add to Cart</button>
+    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+        <input type="hidden" name="cmd" value="_s-xclick">
+        <input type="hidden" name="hosted_button_id" value="5TQHFXSDGWVL2">
+        <input type="submit" value="Join Now" style="background-color:#0070ba; color:white; padding:10px 15px; border:none; border-radius:5px; cursor:pointer;">
+    </form>
     
     <h3>Donations</h3>
-    <input type="number" id="donation-amount" placeholder="Enter amount" />
-    <button onclick="addToCart('Donation', document.getElementById('donation-amount').value, 'Thank you for your support!')">Add to Cart</button>
+    <p>Choose a donation amount and program to support:</p>
+    <form action="https://www.paypal.com/donate" method="post" target="_top">
+        <input type="hidden" name="hosted_button_id" value="DW994LWUN6D6W">
+        <select name="donation-program">
+            <option value="Event Food">Event Food</option>
+            <option value="Event Facilities">Event Facilities</option>
+            <option value="Presenter Fees">Presenter Fees</option>
+            <option value="Annual Business Expenses">Annual Business Expenses</option>
+            <option value="SC AHEAD BOD Discretion">SC AHEAD BOD Discretion</option>
+        </select>
+        <br>
+        <input type="submit" value="Donate Now" style="background-color:#0070ba; color:white; padding:10px 15px; border:none; border-radius:5px; cursor:pointer;">
+    </form>
     
-    <h2>Your Cart</h2>
-    <ul id="cart-list"></ul>
-    <p id="total-price">Total: $0.00</p>
-    
-    <div id="paypal-button-container" class="paypal-button"></div>
-    <script>renderPayPalButtons();</script>
-
     <footer>
-        <p>Contact Treasurer: treasurer@yourchapter.org</p>
+        <p>Contact Treasurer: holmesj@sccsc.edu</p>
         <p>Mail payments to:<br>SC AHEAD Treasurer<br>Joshua Holmes<br>131 Community College Dr<br>Spartanburg, SC 29303</p>
     </footer>
 </body>
 </html>
+
 
 
