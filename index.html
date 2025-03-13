@@ -33,28 +33,38 @@
 </head>
 <body>
     <img src="https://github.com/joshholmes7/SCAHEAD-PayPal-Payments/blob/main/SC%20AHEAD%20Logo%20Color%202024.png?raw=true" alt="Organization Logo" class="logo">
-    <h2>Payment Portal for SC AHEAD</h2>
+    <h2>SC AHEAD Payments Portal</h2>
     <p>Select the items you want to purchase and proceed to checkout.</p>
 
     <h3>Conference Registration</h3>
     <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-        <input type="hidden" name="cmd" value="_s-xclick">
-        <input type="hidden" name="hosted_button_id" value="F3D65M8P8Y4KA">
-        <input type="submit" value="Register Now" style="background-color:#0070ba; color:white; padding:10px 15px; border:none; border-radius:5px; cursor:pointer;">
+        <input type="hidden" name="cmd" value="_cart">
+        <input type="hidden" name="add" value="1">
+        <input type="hidden" name="business" value="YOUR_PAYPAL_EMAIL">
+        <input type="hidden" name="item_name" value="Conference Registration">
+        <input type="hidden" name="amount" value="25.00">
+        <input type="hidden" name="currency_code" value="USD">
+        <input type="submit" value="Add to Cart" style="background-color:#0070ba; color:white; padding:10px 15px; border:none; border-radius:5px; cursor:pointer;">
     </form>
     
     <h3>Individual Membership ($50)</h3>
     <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-        <input type="hidden" name="cmd" value="_s-xclick">
-        <input type="hidden" name="hosted_button_id" value="5TQHFXSDGWVL2">
-        <input type="submit" value="Join Now" style="background-color:#0070ba; color:white; padding:10px 15px; border:none; border-radius:5px; cursor:pointer;">
+        <input type="hidden" name="cmd" value="_cart">
+        <input type="hidden" name="add" value="1">
+        <input type="hidden" name="business" value="YOUR_PAYPAL_EMAIL">
+        <input type="hidden" name="item_name" value="Individual Membership">
+        <input type="hidden" name="amount" value="50.00">
+        <input type="hidden" name="currency_code" value="USD">
+        <input type="submit" value="Add to Cart" style="background-color:#0070ba; color:white; padding:10px 15px; border:none; border-radius:5px; cursor:pointer;">
     </form>
     
     <h3>Donations</h3>
     <p>Choose a donation amount and program to support:</p>
-    <form action="https://www.paypal.com/donate" method="post" target="_top">
-        <input type="hidden" name="hosted_button_id" value="DW994LWUN6D6W">
-        <select name="donation-program">
+    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+        <input type="hidden" name="cmd" value="_donations">
+        <input type="hidden" name="business" value="YOUR_PAYPAL_EMAIL">
+        <input type="hidden" name="currency_code" value="USD">
+        <select name="item_name">
             <option value="Event Food">Event Food</option>
             <option value="Event Facilities">Event Facilities</option>
             <option value="Presenter Fees">Presenter Fees</option>
@@ -62,15 +72,22 @@
             <option value="SC AHEAD BOD Discretion">SC AHEAD BOD Discretion</option>
         </select>
         <br>
+        <input type="text" name="amount" placeholder="Enter amount" required>
+        <br>
         <input type="submit" value="Donate Now" style="background-color:#0070ba; color:white; padding:10px 15px; border:none; border-radius:5px; cursor:pointer;">
     </form>
     
+    <h3>View Cart & Checkout</h3>
+    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+        <input type="hidden" name="cmd" value="_cart">
+        <input type="hidden" name="business" value="YOUR_PAYPAL_EMAIL">
+        <input type="hidden" name="display" value="1">
+        <input type="submit" value="View Cart" style="background-color:#FFA500; color:white; padding:10px 15px; border:none; border-radius:5px; cursor:pointer;">
+    </form>
+
     <footer>
         <p>Contact Treasurer: holmesj@sccsc.edu</p>
         <p>Mail payments to:<br>SC AHEAD Treasurer<br>Joshua Holmes<br>131 Community College Dr<br>Spartanburg, SC 29303</p>
     </footer>
 </body>
 </html>
-
-
-
