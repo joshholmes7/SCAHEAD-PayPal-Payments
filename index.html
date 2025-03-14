@@ -51,22 +51,49 @@
     <script>
         let cartItems = [];
 
-        function addToCart() {
-            let selectedConference = document.getElementById("conference-type").value;
-            let selectedMembership = document.getElementById("membership-year").value;
-            let donationAmount = document.getElementById("donation-amount").value || 0;
-            
-            cartItems = [];
-            if (selectedConference !== "none") {
-                cartItems.push({ name: "Conference Registration", price: parseFloat(selectedConference) });
+        function addRegistrations() {
+            let numRegistrations = document.getElementById("conference-quantity").value;
+            let registrationContainer = document.getElementById("registration-container");
+            registrationContainer.innerHTML = "";
+
+            for (let i = 0; i < numRegistrations; i++) {
+                registrationContainer.innerHTML += `
+                    <div>
+                        <h4>Registration #${i + 1}</h4>
+                        <select class="conference-type">
+                            <option value="25.00">Individual Member - $25.00</option>
+                            <option value="35.00">Individual Non-Member - $35.00</option>
+                        </select>
+                        <input type="text" class="registrant-name" placeholder="Name of person being paid for" required>
+                        <input type="text" class="registrant-institution" placeholder="Institution being represented" required>
+                    </div>
+                `;
             }
-            if (selectedMembership !== "none") {
-                cartItems.push({ name: "Membership", price: parseFloat(selectedMembership) });
+            updateCart();
+        }
+
+        function updateCart() {
+            cartItems = [];
+            let registrationSelects = document.querySelectorAll(".conference-type");
+            let names = document.querySelectorAll(".registrant-name");
+            let institutions = document.querySelectorAll(".registrant-institution");
+            let membershipSelect = document.getElementById("membership-year").value;
+            let donationAmount = document.getElementById("donation-amount").value || 0;
+
+            registrationSelects.forEach((select, index) => {
+                cartItems.push({ 
+                    name: `Conference Registration for ${names[index].value} (${institutions[index].value})`, 
+                    price: parseFloat(select.value) 
+                });
+            });
+            
+            if (membershipSelect !== "none") {
+                cartItems.push({ name: "Membership", price: parseFloat(membershipSelect) });
             }
             if (parseFloat(donationAmount) > 0) {
                 cartItems.push({ name: "Donation", price: parseFloat(donationAmount) });
             }
-
+            
             updateCartDisplay();
         }
 
@@ -128,22 +155,19 @@
     <h2>SC AHEAD Payments Portal</h2>
     <p>Select the items you want to purchase and proceed to checkout.</p>
 
-    <h3>Conference Registration</h3>
-    <select id="conference-type" onchange="addToCart()">
-        <option value="none">Select Conference</option>
-        <option value="25.00">Individual Member - $25.00</option>
-        <option value="35.00">Individual Non-Member - $35.00</option>
-    </select>
+    <h3>Number of Conference Registrations</h3>
+    <input type="number" id="conference-quantity" min="1" value="1" onchange="addRegistrations()">
+    <div id="registration-container"></div>
     
     <h3>Individual Membership</h3>
-    <select id="membership-year" onchange="addToCart()">
+    <select id="membership-year" onchange="updateCart()">
         <option value="none">Select Membership Year</option>
         <option value="50.00">24-25 - $50.00</option>
         <option value="50.00">25-26 - $50.00</option>
     </select>
     
     <h3>Donate</h3>
-    <input type="number" id="donation-amount" placeholder="Enter donation amount" oninput="addToCart()" required>
+    <input type="number" id="donation-amount" placeholder="Enter donation amount" oninput="updateCart()" required>
     
     <div id="cart"></div>
     <div id="paypal-button-container"></div>
