@@ -62,8 +62,11 @@
 
     <h3>Conference Registration</h3>
     <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank" onsubmit="return validateForm(this)">
-        <input type="hidden" name="cmd" value="_s-xclick" />
-        <input type="hidden" name="hosted_button_id" value="EAVLWDKLXAZ9L" />
+        <input type="hidden" name="cmd" value="_cart" />
+        <input type="hidden" name="add" value="1" />
+        <input type="hidden" name="business" value="68CWR4ZHCJE7W" />
+        <input type="hidden" name="item_name" value="Conference Registration" />
+        <input type="hidden" name="currency_code" value="USD" />
         <table>
             <tr><td>Multiple registrations can be added, click View Cart to confirm.</td></tr>
             <tr><td>
@@ -80,22 +83,25 @@
                 </select>
             </td></tr>
             <tr><td>Name of person being paid for:</td></tr>
-            <tr><td><input type="text" name="os2" maxLength="200" required /></td></tr>
+            <tr><td><input type="text" name="on0" maxLength="200" required /></td></tr>
             <tr><td>Institution being Represented:</td></tr>
-            <tr><td><input type="text" name="os3" maxLength="200" required /></td></tr>
+            <tr><td><input type="text" name="on1" maxLength="200" required /></td></tr>
         </table>
-        <input type="hidden" name="currency_code" value="USD" />
         <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_cart_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Add to Cart" />
     </form>
     
     <h3>Individual Membership ($50)</h3>
     <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank" onsubmit="return validateForm(this)">
-        <input type="hidden" name="cmd" value="_s-xclick" />
-        <input type="hidden" name="hosted_button_id" value="5TQHFXSDGWVL2" />
+        <input type="hidden" name="cmd" value="_cart" />
+        <input type="hidden" name="add" value="1" />
+        <input type="hidden" name="business" value="68CWR4ZHCJE7W" />
+        <input type="hidden" name="item_name" value="Individual Membership" />
+        <input type="hidden" name="amount" value="50.00" />
+        <input type="hidden" name="currency_code" value="USD" />
         <table>
             <tr><td>Select your membership year ($50):</td></tr>
             <tr><td>
-                <select name="os0">
+                <select name="on0">
                     <option value="24-25">24-25</option>
                     <option value="25-26">25-26</option>
                     <option value="26-27">26-27</option>
@@ -105,11 +111,10 @@
                 </select>
             </td></tr>
             <tr><td>Please enter the name of the member being paid for:</td></tr>
-            <tr><td><input type="text" name="os1" maxLength="200" required /></td></tr>
+            <tr><td><input type="text" name="on1" maxLength="200" required /></td></tr>
             <tr><td>Institution being Represented:</td></tr>
-            <tr><td><input type="text" name="os2" maxLength="200" required /></td></tr>
+            <tr><td><input type="text" name="on2" maxLength="200" required /></td></tr>
         </table>
-        <input type="hidden" name="currency_code" value="USD" />
         <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_cart_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Add to Cart" />
     </form>
     
