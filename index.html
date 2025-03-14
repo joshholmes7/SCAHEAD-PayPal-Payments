@@ -37,61 +37,64 @@
     <p>Select the items you want to purchase and proceed to checkout.</p>
 
     <h3>Conference Registration</h3>
-    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-        <input type="hidden" name="cmd" value="_cart">
-        <input type="hidden" name="add" value="1">
-        <input type="hidden" name="business" value="68CWR4ZHCJE7W">
-        <input type="hidden" name="item_name" value="Conference Registration">
-        <input type="hidden" name="currency_code" value="USD">
-        <label>Name or names of persons being paid for:</label>
-        <input type="text" name="os0" required>
-        <label>Institution being Represented:</label>
-        <input type="text" name="os1" required>
-        <br>
-        <input type="submit" value="Add to Cart" style="background-color:#0070ba; color:white; padding:10px 15px; border:none; border-radius:5px; cursor:pointer;">
+    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+        <input type="hidden" name="cmd" value="_s-xclick" />
+        <input type="hidden" name="hosted_button_id" value="EAVLWDKLXAZ9L" />
+        <table>
+            <tr><td>Multiple registrations can be added, click View Cart to confirm.</td></tr>
+            <tr><td>
+                <select name="os0">
+                    <option value="Individual Member">Individual Member $25.00 USD</option>
+                    <option value="Individual Non-Member">Individual Non-Member $35.00 USD</option>
+                </select>
+            </td></tr>
+            <tr><td>Conference:</td></tr>
+            <tr><td>
+                <select name="os1">
+                    <option value="Spring Conference">Spring Conference</option>
+                    <option value="Fall Conference">Fall Conference</option>
+                </select>
+            </td></tr>
+            <tr><td>Name of person being paid for:</td></tr>
+            <tr><td><input type="text" name="os2" maxLength="200" /></td></tr>
+            <tr><td>Institution being Represented:</td></tr>
+            <tr><td><input type="text" name="os3" maxLength="200" /></td></tr>
+        </table>
+        <input type="hidden" name="currency_code" value="USD" />
+        <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_cart_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Add to Cart" />
     </form>
     
     <h3>Individual Membership ($50)</h3>
-    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-        <input type="hidden" name="cmd" value="_cart">
-        <input type="hidden" name="add" value="1">
-        <input type="hidden" name="business" value="68CWR4ZHCJE7W">
-        <input type="hidden" name="item_name" value="Individual Membership">
-        <input type="hidden" name="amount" value="50.00">
-        <input type="hidden" name="currency_code" value="USD">
-        <label>Please enter the name/s of the member/s being paid for:</label>
-        <input type="text" name="os0" required>
-        <label>Institution being Represented:</label>
-        <input type="text" name="os1" required>
-        <br>
-        <input type="submit" value="Add to Cart" style="background-color:#0070ba; color:white; padding:10px 15px; border:none; border-radius:5px; cursor:pointer;">
-    </form>
-    
-    <h3>Donations</h3>
-    <p>Choose a donation amount and program to support:</p>
-    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-        <input type="hidden" name="cmd" value="_donations">
-        <input type="hidden" name="business" value="68CWR4ZHCJE7W">
-        <input type="hidden" name="currency_code" value="USD">
-        <select name="item_name">
-            <option value="Event Food">Event Food</option>
-            <option value="Event Facilities">Event Facilities</option>
-            <option value="Presenter Fees">Presenter Fees</option>
-            <option value="Annual Business Expenses">Annual Business Expenses</option>
-            <option value="SC AHEAD BOD Discretion">SC AHEAD BOD Discretion</option>
-        </select>
-        <br>
-        <input type="text" name="amount" placeholder="Enter amount" required>
-        <br>
-        <input type="submit" value="Donate Now" style="background-color:#0070ba; color:white; padding:10px 15px; border:none; border-radius:5px; cursor:pointer;">
+    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+        <input type="hidden" name="cmd" value="_s-xclick" />
+        <input type="hidden" name="hosted_button_id" value="5TQHFXSDGWVL2" />
+        <table>
+            <tr><td>Select your membership year ($50):</td></tr>
+            <tr><td>
+                <select name="os0">
+                    <option value="24-25">24-25</option>
+                    <option value="25-26">25-26</option>
+                    <option value="26-27">26-27</option>
+                    <option value="27-28">27-28</option>
+                    <option value="28-29">28-29</option>
+                    <option value="29-30">29-30</option>
+                </select>
+            </td></tr>
+            <tr><td>Please enter the name of the member being paid for:</td></tr>
+            <tr><td><input type="text" name="os1" maxLength="200" /></td></tr>
+            <tr><td>Institution being Represented:</td></tr>
+            <tr><td><input type="text" name="os2" maxLength="200" /></td></tr>
+        </table>
+        <input type="hidden" name="currency_code" value="USD" />
+        <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_cart_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Add to Cart" />
     </form>
     
     <h3>View Cart & Checkout</h3>
-    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+    <form target="paypal" action="https://www.paypal.com/cgi-bin/webscr" method="post" >
         <input type="hidden" name="cmd" value="_cart">
         <input type="hidden" name="business" value="68CWR4ZHCJE7W">
         <input type="hidden" name="display" value="1">
-        <input type="submit" value="View Cart" style="background-color:#FFA500; color:white; padding:10px 15px; border:none; border-radius:5px; cursor:pointer;">
+        <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_viewcart_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
     </form>
 
     <footer>
