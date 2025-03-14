@@ -18,6 +18,13 @@
         h2, h3 {
             color: #003366;
         }
+        table {
+            margin: 0 auto;
+        }
+        input, select {
+            width: 100%;
+            padding: 5px;
+        }
         footer {
             margin-top: 30px;
             padding-top: 20px;
@@ -30,6 +37,18 @@
             margin-bottom: 20px;
         }
     </style>
+    <script>
+        function validateForm(form) {
+            let inputs = form.querySelectorAll("input[type='text']");
+            for (let input of inputs) {
+                if (input.value.trim() === "") {
+                    alert("Please fill out all fields before adding to cart.");
+                    return false;
+                }
+            }
+            return true;
+        }
+    </script>
 </head>
 <body>
     <img src="https://github.com/joshholmes7/SCAHEAD-PayPal-Payments/blob/main/SC%20AHEAD%20Logo%20Color%202024.png?raw=true" alt="Organization Logo" class="logo">
@@ -37,7 +56,7 @@
     <p>Select the items you want to purchase and proceed to checkout.</p>
 
     <h3>Conference Registration</h3>
-    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank" onsubmit="return validateForm(this)">
         <input type="hidden" name="cmd" value="_s-xclick" />
         <input type="hidden" name="hosted_button_id" value="EAVLWDKLXAZ9L" />
         <table>
@@ -56,16 +75,16 @@
                 </select>
             </td></tr>
             <tr><td>Name of person being paid for:</td></tr>
-            <tr><td><input type="text" name="os2" maxLength="200" /></td></tr>
+            <tr><td><input type="text" name="os2" maxLength="200" required /></td></tr>
             <tr><td>Institution being Represented:</td></tr>
-            <tr><td><input type="text" name="os3" maxLength="200" /></td></tr>
+            <tr><td><input type="text" name="os3" maxLength="200" required /></td></tr>
         </table>
         <input type="hidden" name="currency_code" value="USD" />
         <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_cart_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Add to Cart" />
     </form>
     
     <h3>Individual Membership ($50)</h3>
-    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank" onsubmit="return validateForm(this)">
         <input type="hidden" name="cmd" value="_s-xclick" />
         <input type="hidden" name="hosted_button_id" value="5TQHFXSDGWVL2" />
         <table>
@@ -81,16 +100,16 @@
                 </select>
             </td></tr>
             <tr><td>Please enter the name of the member being paid for:</td></tr>
-            <tr><td><input type="text" name="os1" maxLength="200" /></td></tr>
+            <tr><td><input type="text" name="os1" maxLength="200" required /></td></tr>
             <tr><td>Institution being Represented:</td></tr>
-            <tr><td><input type="text" name="os2" maxLength="200" /></td></tr>
+            <tr><td><input type="text" name="os2" maxLength="200" required /></td></tr>
         </table>
         <input type="hidden" name="currency_code" value="USD" />
         <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_cart_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Add to Cart" />
     </form>
     
     <h3>View Cart & Checkout</h3>
-    <form target="paypal" action="https://www.paypal.com/cgi-bin/webscr" method="post" >
+    <form target="paypal" action="https://www.paypal.com/cgi-bin/webscr" method="post">
         <input type="hidden" name="cmd" value="_cart">
         <input type="hidden" name="business" value="68CWR4ZHCJE7W">
         <input type="hidden" name="display" value="1">
