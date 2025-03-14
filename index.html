@@ -39,30 +39,66 @@
         #paypal-button-container {
             margin-top: 20px;
         }
+        #cart {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: #f9f9f9;
+            text-align: left;
+        }
     </style>
     <script>
-        // Fetch PayPal Client ID from environment variable
-        fetch('/.netlify/functions/get-paypal-client-id')
-            .then(response => response.json())
-            .then(data => {
-                let script = document.createElement('script');
-                script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
-                script.onload = function() { renderPayPalButtons(); };
-                document.head.appendChild(script);
-            })
-            .catch(error => console.error('Error fetching PayPal Client ID:', error));
+        let cartItems = [];
+
+        function addToCart() {
+            let selectedConference = document.getElementById("conference-type").value;
+            let selectedMembership = document.getElementById("membership-year").value;
+            let donationAmount = document.getElementById("donation-amount").value || 0;
+            
+            cartItems = [];
+            if (selectedConference !== "none") {
+                cartItems.push({ name: "Conference Registration", price: parseFloat(selectedConference) });
+            }
+            if (selectedMembership !== "none") {
+                cartItems.push({ name: "Membership", price: parseFloat(selectedMembership) });
+            }
+            if (parseFloat(donationAmount) > 0) {
+                cartItems.push({ name: "Donation", price: parseFloat(donationAmount) });
+            }
+
+            updateCartDisplay();
+        }
+
+        function updateCartDisplay() {
+            let cartDiv = document.getElementById("cart");
+            cartDiv.innerHTML = "<h3>Shopping Cart</h3>";
+            let total = 0;
+            
+            if (cartItems.length === 0) {
+                cartDiv.innerHTML += "<p>Your cart is empty.</p>";
+            } else {
+                cartItems.forEach(item => {
+                    cartDiv.innerHTML += `<p>${item.name}: $${item.price.toFixed(2)}</p>`;
+                    total += item.price;
+                });
+                cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
+            }
+        }
 
         function renderPayPalButtons() {
             paypal.Buttons({
                 createOrder: function(data, actions) {
-                    let selectedConference = document.getElementById("conference-type").value;
-                    let selectedMembership = document.getElementById("membership-year").value;
-                    let donationAmount = document.getElementById("donation-amount").value;
-                    
+                    if (cartItems.length === 0) {
+                        alert("Your cart is empty. Please add items before checkout.");
+                        return;
+                    }
+
+                    let total = cartItems.reduce((sum, item) => sum + item.price, 0);
                     return actions.order.create({
                         purchase_units: [{
                             amount: {
-                                value: parseFloat(selectedConference) + parseFloat(selectedMembership) + parseFloat(donationAmount || 0)
+                                value: total.toFixed(2)
                             },
                             description: "SC AHEAD Payment"
                         }]
@@ -75,6 +111,16 @@
                 }
             }).render('#paypal-button-container');
         }
+
+        fetch('/.netlify/functions/get-paypal-client-id')
+            .then(response => response.json())
+            .then(data => {
+                let script = document.createElement('script');
+                script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
+                script.onload = function() { renderPayPalButtons(); };
+                document.head.appendChild(script);
+            })
+            .catch(error => console.error('Error fetching PayPal Client ID:', error));
     </script>
 </head>
 <body>
@@ -83,24 +129,23 @@
     <p>Select the items you want to purchase and proceed to checkout.</p>
 
     <h3>Conference Registration</h3>
-    <select id="conference-type">
+    <select id="conference-type" onchange="addToCart()">
+        <option value="none">Select Conference</option>
         <option value="25.00">Individual Member - $25.00</option>
         <option value="35.00">Individual Non-Member - $35.00</option>
     </select>
-    <input type="text" id="conference-name" placeholder="Name of person being paid for" required>
-    <input type="text" id="conference-institution" placeholder="Institution being represented" required>
     
-    <h3>Individual Membership ($50)</h3>
-    <select id="membership-year">
+    <h3>Individual Membership</h3>
+    <select id="membership-year" onchange="addToCart()">
+        <option value="none">Select Membership Year</option>
         <option value="50.00">24-25 - $50.00</option>
         <option value="50.00">25-26 - $50.00</option>
     </select>
-    <input type="text" id="membership-name" placeholder="Member Name" required>
-    <input type="text" id="membership-institution" placeholder="Institution being represented" required>
     
     <h3>Donate</h3>
-    <input type="number" id="donation-amount" placeholder="Enter donation amount" required>
+    <input type="number" id="donation-amount" placeholder="Enter donation amount" oninput="addToCart()" required>
     
+    <div id="cart"></div>
     <div id="paypal-button-container"></div>
     
     <footer>
