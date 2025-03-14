@@ -36,22 +36,44 @@
             max-width: 200px;
             margin-bottom: 20px;
         }
-        input[type="image"] {
-            width: auto;
-            max-width: 150px;
-            height: auto;
+        #paypal-button-container {
+            margin-top: 20px;
         }
     </style>
     <script>
-        function validateForm(form) {
-            let inputs = form.querySelectorAll("input[type='text']");
-            for (let input of inputs) {
-                if (input.value.trim() === "") {
-                    alert("Please fill out all fields before adding to cart.");
-                    return false;
+        // Fetch PayPal Client ID from environment variable
+        fetch('/.netlify/functions/get-paypal-client-id')
+            .then(response => response.json())
+            .then(data => {
+                let script = document.createElement('script');
+                script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
+                script.onload = function() { renderPayPalButtons(); };
+                document.head.appendChild(script);
+            })
+            .catch(error => console.error('Error fetching PayPal Client ID:', error));
+
+        function renderPayPalButtons() {
+            paypal.Buttons({
+                createOrder: function(data, actions) {
+                    let selectedConference = document.getElementById("conference-type").value;
+                    let selectedMembership = document.getElementById("membership-year").value;
+                    let donationAmount = document.getElementById("donation-amount").value;
+                    
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: {
+                                value: parseFloat(selectedConference) + parseFloat(selectedMembership) + parseFloat(donationAmount || 0)
+                            },
+                            description: "SC AHEAD Payment"
+                        }]
+                    });
+                },
+                onApprove: function(data, actions) {
+                    return actions.order.capture().then(function(details) {
+                        alert("Transaction completed by " + details.payer.name.given_name);
+                    });
                 }
-            }
-            return true;
+            }).render('#paypal-button-container');
         }
     </script>
 </head>
@@ -61,39 +83,26 @@
     <p>Select the items you want to purchase and proceed to checkout.</p>
 
     <h3>Conference Registration</h3>
-    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank" onsubmit="return validateForm(this)">
-        <input type="hidden" name="cmd" value="_xclick" />
-        <input type="hidden" name="business" value="68CWR4ZHCJE7W" />
-        <input type="hidden" name="item_name" value="Conference Registration" />
-        <input type="hidden" name="amount" value="25.00" />
-        <input type="hidden" name="currency_code" value="USD" />
-        <table>
-            <tr><td>Name of person being paid for:</td></tr>
-            <tr><td><input type="text" name="os0" maxLength="200" required /></td></tr>
-            <tr><td>Institution being Represented:</td></tr>
-            <tr><td><input type="text" name="os1" maxLength="200" required /></td></tr>
-        </table>
-        <input type="submit" value="Buy Now" style="background-color:#0070ba; color:white; padding:10px 15px; border:none; border-radius:5px; cursor:pointer;">
-    </form>
+    <select id="conference-type">
+        <option value="25.00">Individual Member - $25.00</option>
+        <option value="35.00">Individual Non-Member - $35.00</option>
+    </select>
+    <input type="text" id="conference-name" placeholder="Name of person being paid for" required>
+    <input type="text" id="conference-institution" placeholder="Institution being represented" required>
     
-    <h3>Test Simple Button</h3>
-    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
-        <input type="hidden" name="cmd" value="_xclick">
-        <input type="hidden" name="business" value="68CWR4ZHCJE7W">
-        <input type="hidden" name="item_name" value="Test Item">
-        <input type="hidden" name="amount" value="5.00">
-        <input type="hidden" name="currency_code" value="USD">
-        <input type="submit" value="Test Buy Now" style="background-color:#28a745; color:white; padding:10px 15px; border:none; border-radius:5px; cursor:pointer;">
-    </form>
+    <h3>Individual Membership ($50)</h3>
+    <select id="membership-year">
+        <option value="50.00">24-25 - $50.00</option>
+        <option value="50.00">25-26 - $50.00</option>
+    </select>
+    <input type="text" id="membership-name" placeholder="Member Name" required>
+    <input type="text" id="membership-institution" placeholder="Institution being represented" required>
     
-    <h3>View Cart & Checkout</h3>
-    <form target="paypal" action="https://www.paypal.com/cgi-bin/webscr" method="post">
-        <input type="hidden" name="cmd" value="_cart">
-        <input type="hidden" name="business" value="68CWR4ZHCJE7W">
-        <input type="hidden" name="display" value="1">
-        <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_viewcart_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-    </form>
-
+    <h3>Donate</h3>
+    <input type="number" id="donation-amount" placeholder="Enter donation amount" required>
+    
+    <div id="paypal-button-container"></div>
+    
     <footer>
         <p>Contact Treasurer: holmesj@sccsc.edu</p>
         <p>Mail payments to:<br>SC AHEAD Treasurer<br>Joshua Holmes<br>131 Community College Dr<br>Spartanburg, SC 29303</p>
