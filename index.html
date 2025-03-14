@@ -72,12 +72,35 @@
             updateCart();
         }
 
+        function addMemberships() {
+            let numMemberships = document.getElementById("membership-quantity").value;
+            let membershipContainer = document.getElementById("membership-container");
+            membershipContainer.innerHTML = "";
+
+            for (let i = 0; i < numMemberships; i++) {
+                membershipContainer.innerHTML += `
+                    <div>
+                        <h4>Membership #${i + 1}</h4>
+                        <select class="membership-type">
+                            <option value="50.00">24-25 - $50.00</option>
+                            <option value="50.00">25-26 - $50.00</option>
+                        </select>
+                        <input type="text" class="member-name" placeholder="Name of member being paid for" required>
+                        <input type="text" class="member-institution" placeholder="Institution being represented" required>
+                    </div>
+                `;
+            }
+            updateCart();
+        }
+
         function updateCart() {
             cartItems = [];
             let registrationSelects = document.querySelectorAll(".conference-type");
             let names = document.querySelectorAll(".registrant-name");
             let institutions = document.querySelectorAll(".registrant-institution");
-            let membershipSelect = document.getElementById("membership-year").value;
+            let membershipSelects = document.querySelectorAll(".membership-type");
+            let memberNames = document.querySelectorAll(".member-name");
+            let memberInstitutions = document.querySelectorAll(".member-institution");
             let donationAmount = document.getElementById("donation-amount").value || 0;
 
             registrationSelects.forEach((select, index) => {
@@ -87,9 +110,13 @@
                 });
             });
             
-            if (membershipSelect !== "none") {
-                cartItems.push({ name: "Membership", price: parseFloat(membershipSelect) });
-            }
+            membershipSelects.forEach((select, index) => {
+                cartItems.push({ 
+                    name: `Membership for ${memberNames[index].value} (${memberInstitutions[index].value})`, 
+                    price: parseFloat(select.value) 
+                });
+            });
+
             if (parseFloat(donationAmount) > 0) {
                 cartItems.push({ name: "Donation", price: parseFloat(donationAmount) });
             }
@@ -112,69 +139,22 @@
                 cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
             }
         }
-
-        function renderPayPalButtons() {
-            paypal.Buttons({
-                createOrder: function(data, actions) {
-                    if (cartItems.length === 0) {
-                        alert("Your cart is empty. Please add items before checkout.");
-                        return;
-                    }
-
-                    let total = cartItems.reduce((sum, item) => sum + item.price, 0);
-                    return actions.order.create({
-                        purchase_units: [{
-                            amount: {
-                                value: total.toFixed(2)
-                            },
-                            description: "SC AHEAD Payment"
-                        }]
-                    });
-                },
-                onApprove: function(data, actions) {
-                    return actions.order.capture().then(function(details) {
-                        alert("Transaction completed by " + details.payer.name.given_name);
-                    });
-                }
-            }).render('#paypal-button-container');
-        }
-
-        fetch('/.netlify/functions/get-paypal-client-id')
-            .then(response => response.json())
-            .then(data => {
-                let script = document.createElement('script');
-                script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
-                script.onload = function() { renderPayPalButtons(); };
-                document.head.appendChild(script);
-            })
-            .catch(error => console.error('Error fetching PayPal Client ID:', error));
     </script>
 </head>
 <body>
-    <img src="https://github.com/joshholmes7/SCAHEAD-PayPal-Payments/blob/main/SC%20AHEAD%20Logo%20Color%202024.png?raw=true" alt="Organization Logo" class="logo">
     <h2>SC AHEAD Payments Portal</h2>
-    <p>Select the items you want to purchase and proceed to checkout.</p>
 
     <h3>Number of Conference Registrations</h3>
     <input type="number" id="conference-quantity" min="1" value="1" onchange="addRegistrations()">
     <div id="registration-container"></div>
     
-    <h3>Individual Membership</h3>
-    <select id="membership-year" onchange="updateCart()">
-        <option value="none">Select Membership Year</option>
-        <option value="50.00">24-25 - $50.00</option>
-        <option value="50.00">25-26 - $50.00</option>
-    </select>
+    <h3>Number of Memberships</h3>
+    <input type="number" id="membership-quantity" min="1" value="1" onchange="addMemberships()">
+    <div id="membership-container"></div>
     
     <h3>Donate</h3>
     <input type="number" id="donation-amount" placeholder="Enter donation amount" oninput="updateCart()" required>
     
     <div id="cart"></div>
-    <div id="paypal-button-container"></div>
-    
-    <footer>
-        <p>Contact Treasurer: holmesj@sccsc.edu</p>
-        <p>Mail payments to:<br>SC AHEAD Treasurer<br>Joshua Holmes<br>131 Community College Dr<br>Spartanburg, SC 29303</p>
-    </footer>
 </body>
 </html>
