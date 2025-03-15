@@ -45,6 +45,7 @@
             addRegistrations();
             addMemberships();
             updateCart();
+            loadPayPalButtons();
         });
 
         function addRegistrations() {
@@ -61,8 +62,8 @@
                             <option value="25.00">Individual Member - $25.00</option>
                             <option value="35.00">Individual Non-Member - $35.00</option>
                         </select>
-                        <input type="text" class="registrant-name" placeholder="Name" value="${registrations[i].name}" oninput="updateRegistration(${i}, 'name', this.value)" required>
-                        <input type="text" class="registrant-institution" placeholder="Institution" value="${registrations[i].institution}" oninput="updateRegistration(${i}, 'institution', this.value)" required>
+                        <input type="text" class="registrant-name" placeholder="Name" value="${registrations[i].name}" oninput="updateRegistration(${i}, 'name', this.value)">
+                        <input type="text" class="registrant-institution" placeholder="Institution" value="${registrations[i].institution}" oninput="updateRegistration(${i}, 'institution', this.value)">
                     </div>
                 `;
             }
@@ -83,21 +84,11 @@
                             <option value="50.00">24-25 - $50.00</option>
                             <option value="50.00">25-26 - $50.00</option>
                         </select>
-                        <input type="text" class="member-name" placeholder="Name" value="${memberships[i].name}" oninput="updateMembership(${i}, 'name', this.value)" required>
-                        <input type="text" class="member-institution" placeholder="Institution" value="${memberships[i].institution}" oninput="updateMembership(${i}, 'institution', this.value)" required>
+                        <input type="text" class="member-name" placeholder="Name" value="${memberships[i].name}" oninput="updateMembership(${i}, 'name', this.value)">
+                        <input type="text" class="member-institution" placeholder="Institution" value="${memberships[i].institution}" oninput="updateMembership(${i}, 'institution', this.value)">
                     </div>
                 `;
             }
-            updateCart();
-        }
-
-        function updateRegistration(index, field, value) {
-            registrations[index][field] = value;
-            updateCart();
-        }
-
-        function updateMembership(index, field, value) {
-            memberships[index][field] = value;
             updateCart();
         }
 
@@ -109,23 +100,16 @@
             document.getElementById("donation-amount").value = donationAmount;
             
             registrationSelects.forEach((select, index) => {
-                cartItems.push({ 
-                    name: `Conference Registration for ${registrations[index].name} (${registrations[index].institution})`, 
-                    price: parseFloat(select.value) 
-                });
+                cartItems.push({ name: `Conference Registration for ${registrations[index].name} (${registrations[index].institution})`, price: parseFloat(select.value) });
             });
             
             membershipSelects.forEach((select, index) => {
-                cartItems.push({ 
-                    name: `Membership for ${memberships[index].name} (${memberships[index].institution})`, 
-                    price: parseFloat(select.value) 
-                });
+                cartItems.push({ name: `Membership for ${memberships[index].name} (${memberships[index].institution})`, price: parseFloat(select.value) });
             });
             
             if (donationAmount > 0) {
                 cartItems.push({ name: "Donation", price: donationAmount });
             }
-            
             updateCartDisplay();
         }
 
@@ -134,29 +118,34 @@
             cartDiv.innerHTML = "<h3>Shopping Cart</h3>";
             let total = 0;
             
-            if (cartItems.length === 0) {
-                cartDiv.innerHTML += "<p>Your cart is empty.</p>";
-            } else {
-                cartItems.forEach(item => {
-                    cartDiv.innerHTML += `<p>${item.name}: $${item.price.toFixed(2)}</p>`;
-                    total += item.price;
-                });
-                cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
-            }
+            cartItems.forEach(item => {
+                cartDiv.innerHTML += `<p>${item.name}: $${item.price.toFixed(2)}</p>`;
+                total += item.price;
+            });
+            
+            cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
+            cartDiv.innerHTML += '<div id="paypal-button-container"></div>';
+            loadPayPalButtons();
+        }
+
+        function loadPayPalButtons() {
+            fetch('/.netlify/functions/getPaypalClientId')
+                .then(response => response.json())
+                .then(data => {
+                    const script = document.createElement('script');
+                    script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
+                    script.onload = () => {
+                        paypal.Buttons().render('#paypal-button-container');
+                    };
+                    document.head.appendChild(script);
+                })
+                .catch(error => console.error('Error loading PayPal SDK:', error));
         }
     </script>
 </head>
 <body>
     <img src="logo.png" alt="SC AHEAD Logo" class="logo">
     <h2>SC AHEAD Payments Portal</h2>
-    <h3>Number of Conference Registrations</h3>
-    <input type="number" id="conference-quantity" value="1" min="1" onchange="addRegistrations()">
-    <div id="registration-container"></div>
-    <h3>Number of Memberships</h3>
-    <input type="number" id="membership-quantity" value="1" min="1" onchange="addMemberships()">
-    <div id="membership-container"></div>
-    <h3>Make a Donation</h3>
-    <input type="number" id="donation-amount" value="0" min="0" oninput="updateCart()">
     <div id="cart"></div>
 </body>
 </html>
