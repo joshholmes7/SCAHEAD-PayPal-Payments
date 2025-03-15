@@ -50,7 +50,13 @@
     <div id="membership-container"></div>
 
     <label><strong>Make a Donation</strong></label>
-    <input type="number" id="donation-amount" value="0" min="0" onblur="updateCart()">
+    <div>
+        <input type="radio" name="donation-amount" value="100" onchange="updateCart()"> $100
+        <input type="radio" name="donation-amount" value="500" onchange="updateCart()"> $500
+        <input type="radio" name="donation-amount" value="1000" onchange="updateCart()"> $1000
+        <input type="radio" name="donation-amount" id="donation-other" value="other" onchange="toggleDonationInput()"> Other
+        <input type="number" id="donation-amount" min="0" placeholder="Enter Amount" onblur="updateCart()" disabled>
+    </div>
     <select id="donation-category" onchange="updateCart()">
         <option value="Event Food">Event Food</option>
         <option value="Event Facilities">Event Facilities</option>
@@ -81,12 +87,17 @@
                                 <option value="25.00">Individual Member - $25.00</option>
                                 <option value="35.00">Individual Non-Member - $35.00</option>
                             </select>
-                            <input type="text" class="registrant-name" placeholder="Name" value="${registrations[i].name}" onblur="updateRegistration(${i}, 'name', this.value)">
-                            <input type="text" class="registrant-institution" placeholder="Institution" value="${registrations[i].institution}" onblur="updateRegistration(${i}, 'institution', this.value)">
+                            <input type="text" class="registrant-name" placeholder="Name" value="${registrations[i].name}" onblur="updateCart()">
+                            <input type="text" class="registrant-institution" placeholder="Institution" value="${registrations[i].institution}" onblur="updateCart()">
                         </div>
                     `;
                 }
                 updateCart();
+            }
+
+            function toggleDonationInput() {
+                let otherInput = document.getElementById("donation-amount");
+                otherInput.disabled = !document.getElementById("donation-other").checked;
             }
 
             function updateCart() {
@@ -94,15 +105,17 @@
                 let registrationSelects = document.querySelectorAll(".conference-type");
                 let names = document.querySelectorAll(".registrant-name");
                 let institutions = document.querySelectorAll(".registrant-institution");
-                let donationAmount = Math.max(0, parseFloat(document.getElementById("donation-amount").value) || 0);
+                let donationAmount = document.querySelector("input[name='donation-amount']:checked").value;
                 let donationCategory = document.getElementById("donation-category").value;
-
+                
                 registrationSelects.forEach((select, index) => {
                     cartItems.push({ name: `Conference Registration for ${names[index].value} (${institutions[index].value})`, price: parseFloat(select.value) });
                 });
                 
-                if (donationAmount > 0) {
-                    cartItems.push({ name: `Donation for ${donationCategory}`, price: donationAmount });
+                if (donationAmount && donationAmount !== "other") {
+                    cartItems.push({ name: `Donation for ${donationCategory}`, price: parseFloat(donationAmount) });
+                } else if (!document.getElementById("donation-amount").disabled) {
+                    cartItems.push({ name: `Donation for ${donationCategory}`, price: parseFloat(document.getElementById("donation-amount").value) });
                 }
                 updateCartDisplay();
             }
@@ -118,24 +131,8 @@
                 });
 
                 cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
-                cartDiv.innerHTML += '<div id="paypal-button-container"></div>';
-                loadPayPalButtons();
             }
-
-            function loadPayPalButtons() {
-                fetch('/.netlify/functions/getPaypalClientId')
-                    .then(response => response.json())
-                    .then(data => {
-                        const script = document.createElement('script');
-                        script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
-                        script.onload = () => {
-                            paypal.Buttons().render('#paypal-button-container');
-                        };
-                        document.head.appendChild(script);
-                    })
-                    .catch(error => console.error('Error loading PayPal SDK:', error));
-            }
-
+            
             addRegistrations();
             updateCart();
         });
