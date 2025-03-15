@@ -51,6 +51,11 @@
     <script>
         let cartItems = [];
 
+        document.addEventListener("DOMContentLoaded", function () {
+            addRegistrations();
+            addMemberships();
+        });
+
         function addRegistrations() {
             let numRegistrations = document.getElementById("conference-quantity").value;
             let registrationContainer = document.getElementById("registration-container");
