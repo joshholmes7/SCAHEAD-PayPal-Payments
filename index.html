@@ -150,23 +150,15 @@
                 });
                 cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
             }
+            
+            cartDiv.innerHTML += '<div id="paypal-button-container"></div>';
+            paypal.Buttons().render('#paypal-button-container');
         }
     </script>
+    <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=USD"></script>
 </head>
 <body>
     <h2>SC AHEAD Payments Portal</h2>
-
-    <h3>Number of Conference Registrations</h3>
-    <input type="number" id="conference-quantity" min="1" value="1" onchange="addRegistrations()">
-    <div id="registration-container"></div>
-    
-    <h3>Number of Memberships</h3>
-    <input type="number" id="membership-quantity" min="1" value="1" onchange="addMemberships()">
-    <div id="membership-container"></div>
-    
-    <h3>Donate</h3>
-    <input type="number" id="donation-amount" min="0" placeholder="Enter donation amount" oninput="updateCart()">
-    
     <div id="cart"></div>
 </body>
 </html>
