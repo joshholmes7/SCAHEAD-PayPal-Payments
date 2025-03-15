@@ -56,12 +56,12 @@
                 registrationContainer.innerHTML += `
                     <div>
                         <h4>Conference Registration #${i + 1}</h4>
-                        <select class="conference-type">
+                        <select class="conference-type" onchange="updateCart()">
                             <option value="25.00">Individual Member - $25.00</option>
                             <option value="35.00">Individual Non-Member - $35.00</option>
                         </select>
-                        <input type="text" class="registrant-name" placeholder="Name" value="${registrations[i].name}" required>
-                        <input type="text" class="registrant-institution" placeholder="Institution" value="${registrations[i].institution}" required>
+                        <input type="text" class="registrant-name" placeholder="Name" value="${registrations[i].name}" onblur="updateCart()" required>
+                        <input type="text" class="registrant-institution" placeholder="Institution" value="${registrations[i].institution}" onblur="updateCart()" required>
                     </div>
                 `;
             }
@@ -78,12 +78,12 @@
                 membershipContainer.innerHTML += `
                     <div>
                         <h4>Membership #${i + 1}</h4>
-                        <select class="membership-type">
+                        <select class="membership-type" onchange="updateCart()">
                             <option value="50.00">24-25 - $50.00</option>
                             <option value="50.00">25-26 - $50.00</option>
                         </select>
-                        <input type="text" class="member-name" placeholder="Name" value="${memberships[i].name}" required>
-                        <input type="text" class="member-institution" placeholder="Institution" value="${memberships[i].institution}" required>
+                        <input type="text" class="member-name" placeholder="Name" value="${memberships[i].name}" onblur="updateCart()" required>
+                        <input type="text" class="member-institution" placeholder="Institution" value="${memberships[i].institution}" onblur="updateCart()" required>
                     </div>
                 `;
             }
@@ -140,18 +140,6 @@
             }
             cartDiv.innerHTML += '<div id="paypal-button-container"></div>';
             renderPayPalButton();
-        }
-
-        function renderPayPalButton() {
-            fetch('/.netlify/functions/getPaypalClientId')
-                .then(response => response.json())
-                .then(data => {
-                    const script = document.createElement('script');
-                    script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
-                    script.onload = () => paypal.Buttons().render('#paypal-button-container');
-                    document.head.appendChild(script);
-                })
-                .catch(error => console.error('Error loading PayPal SDK:', error));
         }
     </script>
 </head>
