@@ -47,7 +47,7 @@
         });
 
         function addRegistrations() {
-            let numRegistrations = document.getElementById("conference-quantity").value;
+            let numRegistrations = parseInt(document.getElementById("conference-quantity").value);
             let registrationContainer = document.getElementById("registration-container");
             registrationContainer.innerHTML = "";
             
@@ -69,7 +69,7 @@
         }
 
         function addMemberships() {
-            let numMemberships = document.getElementById("membership-quantity").value;
+            let numMemberships = parseInt(document.getElementById("membership-quantity").value);
             let membershipContainer = document.getElementById("membership-container");
             membershipContainer.innerHTML = "";
             
@@ -143,11 +143,15 @@
         }
 
         function renderPayPalButton() {
-            setTimeout(() => {
-                if (typeof paypal !== "undefined") {
-                    paypal.Buttons().render('#paypal-button-container');
-                }
-            }, 500);
+            fetch('/.netlify/functions/getPaypalClientId')
+                .then(response => response.json())
+                .then(data => {
+                    const script = document.createElement('script');
+                    script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
+                    script.onload = () => paypal.Buttons().render('#paypal-button-container');
+                    document.head.appendChild(script);
+                })
+                .catch(error => console.error('Error loading PayPal SDK:', error));
         }
     </script>
 </head>
