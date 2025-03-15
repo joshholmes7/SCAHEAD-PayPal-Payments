@@ -50,6 +50,8 @@
     </style>
     <script>
         let cartItems = [];
+        let registrations = [];
+        let memberships = [];
 
         document.addEventListener("DOMContentLoaded", function () {
             addRegistrations();
@@ -60,8 +62,9 @@
             let numRegistrations = document.getElementById("conference-quantity").value;
             let registrationContainer = document.getElementById("registration-container");
             registrationContainer.innerHTML = "";
-
+            
             for (let i = 0; i < numRegistrations; i++) {
+                if (!registrations[i]) registrations[i] = { name: "", institution: "" };
                 registrationContainer.innerHTML += `
                     <div>
                         <h4>Conference Registration #${i + 1}</h4>
@@ -69,8 +72,8 @@
                             <option value="25.00">Individual Member - $25.00</option>
                             <option value="35.00">Individual Non-Member - $35.00</option>
                         </select>
-                        <input type="text" class="registrant-name" placeholder="Name of person being paid for" required>
-                        <input type="text" class="registrant-institution" placeholder="Institution being represented" required>
+                        <input type="text" class="registrant-name" placeholder="Name of person being paid for" value="${registrations[i].name}" required>
+                        <input type="text" class="registrant-institution" placeholder="Institution being represented" value="${registrations[i].institution}" required>
                     </div>
                 `;
             }
@@ -81,8 +84,9 @@
             let numMemberships = document.getElementById("membership-quantity").value;
             let membershipContainer = document.getElementById("membership-container");
             membershipContainer.innerHTML = "";
-
+            
             for (let i = 0; i < numMemberships; i++) {
+                if (!memberships[i]) memberships[i] = { name: "", institution: "" };
                 membershipContainer.innerHTML += `
                     <div>
                         <h4>Membership #${i + 1}</h4>
@@ -90,8 +94,8 @@
                             <option value="50.00">24-25 - $50.00</option>
                             <option value="50.00">25-26 - $50.00</option>
                         </select>
-                        <input type="text" class="member-name" placeholder="Name of member being paid for" required>
-                        <input type="text" class="member-institution" placeholder="Institution being represented" required>
+                        <input type="text" class="member-name" placeholder="Name of member being paid for" value="${memberships[i].name}" required>
+                        <input type="text" class="member-institution" placeholder="Institution being represented" value="${memberships[i].institution}" required>
                     </div>
                 `;
             }
@@ -106,9 +110,11 @@
             let membershipSelects = document.querySelectorAll(".membership-type");
             let memberNames = document.querySelectorAll(".member-name");
             let memberInstitutions = document.querySelectorAll(".member-institution");
-            let donationAmount = document.getElementById("donation-amount").value || 0;
-
+            let donationAmount = Math.max(0, parseFloat(document.getElementById("donation-amount").value) || 0);
+            document.getElementById("donation-amount").value = donationAmount;
+            
             registrationSelects.forEach((select, index) => {
+                registrations[index] = { name: names[index].value, institution: institutions[index].value };
                 cartItems.push({ 
                     name: `Conference Registration for ${names[index].value} (${institutions[index].value})`, 
                     price: parseFloat(select.value) 
@@ -116,14 +122,15 @@
             });
             
             membershipSelects.forEach((select, index) => {
+                memberships[index] = { name: memberNames[index].value, institution: memberInstitutions[index].value };
                 cartItems.push({ 
                     name: `Membership for ${memberNames[index].value} (${memberInstitutions[index].value})`, 
                     price: parseFloat(select.value) 
                 });
             });
-
-            if (parseFloat(donationAmount) > 0) {
-                cartItems.push({ name: "Donation", price: parseFloat(donationAmount) });
+            
+            if (donationAmount > 0) {
+                cartItems.push({ name: "Donation", price: donationAmount });
             }
             
             updateCartDisplay();
@@ -158,7 +165,7 @@
     <div id="membership-container"></div>
     
     <h3>Donate</h3>
-    <input type="number" id="donation-amount" placeholder="Enter donation amount" oninput="updateCart()" required>
+    <input type="number" id="donation-amount" min="0" placeholder="Enter donation amount" oninput="updateCart()">
     
     <div id="cart"></div>
 </body>
