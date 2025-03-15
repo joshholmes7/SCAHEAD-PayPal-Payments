@@ -60,8 +60,8 @@
                             <option value="25.00">Individual Member - $25.00</option>
                             <option value="35.00">Individual Non-Member - $35.00</option>
                         </select>
-                        <input type="text" class="registrant-name" placeholder="Name" value="${registrations[i].name}" onblur="updateCart()" required>
-                        <input type="text" class="registrant-institution" placeholder="Institution" value="${registrations[i].institution}" onblur="updateCart()" required>
+                        <input type="text" class="registrant-name" placeholder="Name" value="${registrations[i].name}" oninput="updateRegistration(${i}, 'name', this.value)" required>
+                        <input type="text" class="registrant-institution" placeholder="Institution" value="${registrations[i].institution}" oninput="updateRegistration(${i}, 'institution', this.value)" required>
                     </div>
                 `;
             }
@@ -82,37 +82,41 @@
                             <option value="50.00">24-25 - $50.00</option>
                             <option value="50.00">25-26 - $50.00</option>
                         </select>
-                        <input type="text" class="member-name" placeholder="Name" value="${memberships[i].name}" onblur="updateCart()" required>
-                        <input type="text" class="member-institution" placeholder="Institution" value="${memberships[i].institution}" onblur="updateCart()" required>
+                        <input type="text" class="member-name" placeholder="Name" value="${memberships[i].name}" oninput="updateMembership(${i}, 'name', this.value)" required>
+                        <input type="text" class="member-institution" placeholder="Institution" value="${memberships[i].institution}" oninput="updateMembership(${i}, 'institution', this.value)" required>
                     </div>
                 `;
             }
             updateCart();
         }
 
+        function updateRegistration(index, field, value) {
+            registrations[index][field] = value;
+            updateCart();
+        }
+
+        function updateMembership(index, field, value) {
+            memberships[index][field] = value;
+            updateCart();
+        }
+
         function updateCart() {
             cartItems = [];
             let registrationSelects = document.querySelectorAll(".conference-type");
-            let names = document.querySelectorAll(".registrant-name");
-            let institutions = document.querySelectorAll(".registrant-institution");
             let membershipSelects = document.querySelectorAll(".membership-type");
-            let memberNames = document.querySelectorAll(".member-name");
-            let memberInstitutions = document.querySelectorAll(".member-institution");
             let donationAmount = Math.max(0, parseFloat(document.getElementById("donation-amount").value) || 0);
             document.getElementById("donation-amount").value = donationAmount;
             
             registrationSelects.forEach((select, index) => {
-                registrations[index] = { name: names[index].value, institution: institutions[index].value };
                 cartItems.push({ 
-                    name: `Conference Registration for ${names[index].value} (${institutions[index].value})`, 
+                    name: `Conference Registration for ${registrations[index].name} (${registrations[index].institution})`, 
                     price: parseFloat(select.value) 
                 });
             });
             
             membershipSelects.forEach((select, index) => {
-                memberships[index] = { name: memberNames[index].value, institution: memberInstitutions[index].value };
                 cartItems.push({ 
-                    name: `Membership for ${memberNames[index].value} (${memberInstitutions[index].value})`, 
+                    name: `Membership for ${memberships[index].name} (${memberships[index].institution})`, 
                     price: parseFloat(select.value) 
                 });
             });
@@ -138,8 +142,6 @@
                 });
                 cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
             }
-            cartDiv.innerHTML += '<div id="paypal-button-container"></div>';
-            renderPayPalButton();
         }
     </script>
 </head>
