@@ -41,6 +41,7 @@
             gap: 15px;
         }
     </style>
+    <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=USD"></script>
 </head>
 <body>
     <img src="https://github.com/joshholmes7/SCAHEAD-PayPal-Payments/blob/main/SC%20AHEAD%20Logo%20Color%202024.png?raw=true" alt="SC AHEAD Logo" class="logo">
@@ -71,6 +72,7 @@
     </select>
 
     <div id="cart"></div>
+    <div id="paypal-button-container"></div>
 
     <script>
         let cartItems = [];
@@ -90,7 +92,6 @@
                 </select>
                 <input type="text" class="registrant-name" placeholder="Name" oninput="updateCart()">
                 <input type="text" class="registrant-institution" placeholder="Institution" oninput="updateCart()">
-                <button onclick="addRegistration()">Add Another</button>
             `;
             container.appendChild(div);
             updateCart();
@@ -109,7 +110,6 @@
                 </select>
                 <input type="text" class="member-name" placeholder="Name" oninput="updateCart()">
                 <input type="text" class="member-institution" placeholder="Institution" oninput="updateCart()">
-                <button onclick="addMembership()">Add Another</button>
             `;
             container.appendChild(div);
             updateCart();
@@ -123,18 +123,15 @@
         function updateCart() {
             cartItems = [];
             document.querySelectorAll(".conference-type").forEach((select, index) => {
-                cartItems.push({ name: `Conference Registration`, price: parseFloat(select.value) });
+                let name = document.querySelectorAll(".registrant-name")[index]?.value || "";
+                let institution = document.querySelectorAll(".registrant-institution")[index]?.value || "";
+                cartItems.push({ name: `Conference Registration for ${name} (${institution})`, price: parseFloat(select.value) });
             });
             document.querySelectorAll(".membership-type").forEach((select, index) => {
-                cartItems.push({ name: `Membership`, price: parseFloat(select.value) });
+                let name = document.querySelectorAll(".member-name")[index]?.value || "";
+                let institution = document.querySelectorAll(".member-institution")[index]?.value || "";
+                cartItems.push({ name: `Membership for ${name} (${institution})`, price: parseFloat(select.value) });
             });
-            let donationAmount = document.querySelector("input[name='donation-amount']:checked");
-            let donationCategory = document.getElementById("donation-category").value;
-            if (donationAmount && donationAmount.value !== "other") {
-                cartItems.push({ name: `Donation for ${donationCategory}`, price: parseFloat(donationAmount.value) });
-            } else if (!document.getElementById("donation-amount").disabled) {
-                cartItems.push({ name: `Donation for ${donationCategory}`, price: parseFloat(document.getElementById("donation-amount").value) });
-            }
             updateCartDisplay();
         }
 
