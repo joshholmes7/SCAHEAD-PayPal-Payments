@@ -31,6 +31,10 @@
             background: #f9f9f9;
             text-align: left;
         }
+        .logo {
+            max-width: 200px;
+            margin-bottom: 20px;
+        }
     </style>
     <script>
         let cartItems = [];
@@ -57,8 +61,8 @@
                             <option value="25.00">Individual Member - $25.00</option>
                             <option value="35.00">Individual Non-Member - $35.00</option>
                         </select>
-                        <input type="text" class="registrant-name" placeholder="Name" value="${registrations[i].name}" onblur="updateRegistration(${i}, 'name', this.value)" required>
-                        <input type="text" class="registrant-institution" placeholder="Institution" value="${registrations[i].institution}" onblur="updateRegistration(${i}, 'institution', this.value)" required>
+                        <input type="text" class="registrant-name" placeholder="Name" value="${registrations[i].name}" oninput="updateRegistration(${i}, 'name', this.value)" required>
+                        <input type="text" class="registrant-institution" placeholder="Institution" value="${registrations[i].institution}" oninput="updateRegistration(${i}, 'institution', this.value)" required>
                     </div>
                 `;
             }
@@ -79,8 +83,8 @@
                             <option value="50.00">24-25 - $50.00</option>
                             <option value="50.00">25-26 - $50.00</option>
                         </select>
-                        <input type="text" class="member-name" placeholder="Name" value="${memberships[i].name}" onblur="updateMembership(${i}, 'name', this.value)" required>
-                        <input type="text" class="member-institution" placeholder="Institution" value="${memberships[i].institution}" onblur="updateMembership(${i}, 'institution', this.value)" required>
+                        <input type="text" class="member-name" placeholder="Name" value="${memberships[i].name}" oninput="updateMembership(${i}, 'name', this.value)" required>
+                        <input type="text" class="member-institution" placeholder="Institution" value="${memberships[i].institution}" oninput="updateMembership(${i}, 'institution', this.value)" required>
                     </div>
                 `;
             }
@@ -143,6 +147,7 @@
     </script>
 </head>
 <body>
+    <img src="logo.png" alt="SC AHEAD Logo" class="logo">
     <h2>SC AHEAD Payments Portal</h2>
     <h3>Number of Conference Registrations</h3>
     <input type="number" id="conference-quantity" value="1" min="1" onchange="addRegistrations()">
