@@ -36,116 +36,142 @@
             margin-bottom: 20px;
         }
     </style>
-    <script>
-        let cartItems = [];
-        let registrations = [{ name: "", institution: "" }];
-        let memberships = [{ name: "", institution: "" }];
-        
-        document.addEventListener("DOMContentLoaded", function () {
-            addRegistrations();
-            addMemberships();
-            updateCart();
-            loadPayPalButtons();
-        });
-        
-        function addRegistrations() {
-            let numRegistrations = parseInt(document.getElementById("conference-quantity").value);
-            let registrationContainer = document.getElementById("registration-container");
-            registrationContainer.innerHTML = "";
-            
-            for (let i = 0; i < numRegistrations; i++) {
-                if (!registrations[i]) registrations[i] = { name: "", institution: "" };
-                registrationContainer.innerHTML += `
-                    <div>
-                        <h4>Conference Registration #${i + 1}</h4>
-                        <select class="conference-type" onchange="updateCart()">
-                            <option value="25.00">Individual Member - $25.00</option>
-                            <option value="35.00">Individual Non-Member - $35.00</option>
-                        </select>
-                        <input type="text" class="registrant-name" placeholder="Name" value="${registrations[i].name}" onblur="updateRegistration(${i}, 'name', this.value)">
-                        <input type="text" class="registrant-institution" placeholder="Institution" value="${registrations[i].institution}" onblur="updateRegistration(${i}, 'institution', this.value)">
-                    </div>
-                `;
-            }
-            updateCart();
-        }
-        
-        function addMemberships() {
-            let numMemberships = parseInt(document.getElementById("membership-quantity").value);
-            let membershipContainer = document.getElementById("membership-container");
-            membershipContainer.innerHTML = "";
-            
-            for (let i = 0; i < numMemberships; i++) {
-                if (!memberships[i]) memberships[i] = { name: "", institution: "" };
-                membershipContainer.innerHTML += `
-                    <div>
-                        <h4>Membership #${i + 1}</h4>
-                        <select class="membership-type" onchange="updateCart()">
-                            <option value="50.00">24-25 - $50.00</option>
-                            <option value="50.00">25-26 - $50.00</option>
-                        </select>
-                        <input type="text" class="member-name" placeholder="Name" value="${memberships[i].name}" onblur="updateMembership(${i}, 'name', this.value)">
-                        <input type="text" class="member-institution" placeholder="Institution" value="${memberships[i].institution}" onblur="updateMembership(${i}, 'institution', this.value)">
-                    </div>
-                `;
-            }
-            updateCart();
-        }
-        
-        function updateCart() {
-            cartItems = [];
-            let registrationSelects = document.querySelectorAll(".conference-type");
-            let membershipSelects = document.querySelectorAll(".membership-type");
-            let donationAmount = Math.max(0, parseFloat(document.getElementById("donation-amount").value) || 0);
-            document.getElementById("donation-amount").value = donationAmount;
-            
-            registrationSelects.forEach((select, index) => {
-                cartItems.push({ name: `Conference Registration for ${registrations[index].name} (${registrations[index].institution})`, price: parseFloat(select.value) });
-            });
-            
-            membershipSelects.forEach((select, index) => {
-                cartItems.push({ name: `Membership for ${memberships[index].name} (${memberships[index].institution})`, price: parseFloat(select.value) });
-            });
-            
-            if (donationAmount > 0) {
-                cartItems.push({ name: "Donation", price: donationAmount });
-            }
-            updateCartDisplay();
-        }
-        
-        function updateCartDisplay() {
-            let cartDiv = document.getElementById("cart");
-            cartDiv.innerHTML = "<h3>Shopping Cart</h3>";
-            let total = 0;
-            
-            cartItems.forEach(item => {
-                cartDiv.innerHTML += `<p>${item.name}: $${item.price.toFixed(2)}</p>`;
-                total += item.price;
-            });
-            
-            cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
-            cartDiv.innerHTML += '<div id="paypal-button-container"></div>';
-            loadPayPalButtons();
-        }
-        
-        function loadPayPalButtons() {
-            fetch('/.netlify/functions/getPaypalClientId')
-                .then(response => response.json())
-                .then(data => {
-                    const script = document.createElement('script');
-                    script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
-                    script.onload = () => {
-                        paypal.Buttons().render('#paypal-button-container');
-                    };
-                    document.head.appendChild(script);
-                })
-                .catch(error => console.error('Error loading PayPal SDK:', error));
-        }
-    </script>
 </head>
 <body>
     <img src="logo.png" alt="SC AHEAD Logo" class="logo">
     <h2>SC AHEAD Payments Portal</h2>
+
+    <h3>Number of Conference Registrations</h3>
+    <input type="number" id="conference-quantity" min="1" value="1">
+
+    <div id="registration-container"></div>
+
+    <h3>Number of Memberships</h3>
+    <input type="number" id="membership-quantity" min="1" value="1">
+    <div id="membership-container"></div>
+
+    <h3>Make a Donation</h3>
+    <input type="number" id="donation-amount" min="0" value="0">
+
     <div id="cart"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let cartItems = [];
+            let registrations = [{ name: "", institution: "" }];
+            let memberships = [{ name: "", institution: "" }];
+
+            document.getElementById("conference-quantity").addEventListener("change", addRegistrations);
+            document.getElementById("membership-quantity").addEventListener("change", addMemberships);
+            document.getElementById("donation-amount").addEventListener("input", updateCart);
+
+            function addRegistrations() {
+                let numRegistrations = parseInt(document.getElementById("conference-quantity").value) || 1;
+                let registrationContainer = document.getElementById("registration-container");
+                registrationContainer.innerHTML = "";
+
+                for (let i = 0; i < numRegistrations; i++) {
+                    if (!registrations[i]) registrations[i] = { name: "", institution: "" };
+                    registrationContainer.innerHTML += `
+                        <div>
+                            <h4>Conference Registration #${i + 1}</h4>
+                            <select class="conference-type" onchange="updateCart()">
+                                <option value="25.00">Individual Member - $25.00</option>
+                                <option value="35.00">Individual Non-Member - $35.00</option>
+                            </select>
+                            <input type="text" class="registrant-name" placeholder="Name" value="${registrations[i].name}" onblur="updateRegistration(${i}, 'name', this.value)">
+                            <input type="text" class="registrant-institution" placeholder="Institution" value="${registrations[i].institution}" onblur="updateRegistration(${i}, 'institution', this.value)">
+                        </div>
+                    `;
+                }
+                updateCart();
+            }
+
+            function addMemberships() {
+                let numMemberships = parseInt(document.getElementById("membership-quantity").value) || 1;
+                let membershipContainer = document.getElementById("membership-container");
+                membershipContainer.innerHTML = "";
+
+                for (let i = 0; i < numMemberships; i++) {
+                    if (!memberships[i]) memberships[i] = { name: "", institution: "" };
+                    membershipContainer.innerHTML += `
+                        <div>
+                            <h4>Membership #${i + 1}</h4>
+                            <select class="membership-type" onchange="updateCart()">
+                                <option value="50.00">24-25 - $50.00</option>
+                                <option value="50.00">25-26 - $50.00</option>
+                            </select>
+                            <input type="text" class="member-name" placeholder="Name" value="${memberships[i].name}" onblur="updateMembership(${i}, 'name', this.value)">
+                            <input type="text" class="member-institution" placeholder="Institution" value="${memberships[i].institution}" onblur="updateMembership(${i}, 'institution', this.value)">
+                        </div>
+                    `;
+                }
+                updateCart();
+            }
+
+            function updateRegistration(index, field, value) {
+                registrations[index][field] = value;
+                updateCart();
+            }
+
+            function updateMembership(index, field, value) {
+                memberships[index][field] = value;
+                updateCart();
+            }
+
+            function updateCart() {
+                cartItems = [];
+                let registrationSelects = document.querySelectorAll(".conference-type");
+                let membershipSelects = document.querySelectorAll(".membership-type");
+                let donationAmount = Math.max(0, parseFloat(document.getElementById("donation-amount").value) || 0);
+
+                registrationSelects.forEach((select, index) => {
+                    cartItems.push({ name: `Conference Registration for ${registrations[index].name} (${registrations[index].institution})`, price: parseFloat(select.value) });
+                });
+
+                membershipSelects.forEach((select, index) => {
+                    cartItems.push({ name: `Membership for ${memberships[index].name} (${memberships[index].institution})`, price: parseFloat(select.value) });
+                });
+
+                if (donationAmount > 0) {
+                    cartItems.push({ name: "Donation", price: donationAmount });
+                }
+                updateCartDisplay();
+            }
+
+            function updateCartDisplay() {
+                let cartDiv = document.getElementById("cart");
+                cartDiv.innerHTML = "<h3>Shopping Cart</h3>";
+                let total = 0;
+
+                cartItems.forEach(item => {
+                    cartDiv.innerHTML += `<p>${item.name}: $${item.price.toFixed(2)}</p>`;
+                    total += item.price;
+                });
+
+                cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
+                cartDiv.innerHTML += '<div id="paypal-button-container"></div>';
+                loadPayPalButtons();
+            }
+
+            function loadPayPalButtons() {
+                fetch('/.netlify/functions/getPaypalClientId')
+                    .then(response => response.json())
+                    .then(data => {
+                        const script = document.createElement('script');
+                        script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
+                        script.onload = () => {
+                            paypal.Buttons().render('#paypal-button-container');
+                        };
+                        document.head.appendChild(script);
+                    })
+                    .catch(error => console.error('Error loading PayPal SDK:', error));
+            }
+
+            addRegistrations();
+            addMemberships();
+            updateCart();
+        });
+    </script>
 </body>
 </html>
