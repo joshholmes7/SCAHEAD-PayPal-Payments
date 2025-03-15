@@ -141,17 +141,14 @@
             cartDiv.innerHTML += '<div id="paypal-button-container"></div>';
             renderPayPalButton();
         }
-    </script>
-    <script>
-    fetch('/.netlify/functions/getPaypalClientId')
-        .then(response => response.json())
-        .then(data => {
-            const script = document.createElement('script');
-            script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
-            script.onload = () => renderPayPalButton();
-            document.head.appendChild(script);
-        })
-        .catch(error => console.error('Error loading PayPal SDK:', error));
+
+        function renderPayPalButton() {
+            setTimeout(() => {
+                if (typeof paypal !== "undefined") {
+                    paypal.Buttons().render('#paypal-button-container');
+                }
+            }, 500);
+        }
     </script>
 </head>
 <body>
@@ -163,7 +160,7 @@
     <input type="number" id="membership-quantity" value="1" min="1" onchange="addMemberships()">
     <div id="membership-container"></div>
     <h3>Make a Donation</h3>
-    <input type="number" id="donation-amount" placeholder="Enter donation amount" oninput="updateCart()" min="0">
+    <input type="number" id="donation-amount" value="0" min="0" oninput="updateCart()">
     <div id="cart"></div>
 </body>
 </html>
