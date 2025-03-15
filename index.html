@@ -155,7 +155,20 @@
             paypal.Buttons().render('#paypal-button-container');
         }
     </script>
-    <script src="https://www.paypal.com/sdk/js?client-id=<%= process.env.PAYPAL_CLIENT_ID %>&currency=USD"></script>
+    <script>
+    fetch('/.netlify/functions/getPaypalClientId')
+        .then(response => response.json())
+        .then(data => {
+            const script = document.createElement('script');
+            script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
+            script.onload = () => {
+                paypal.Buttons().render('#paypal-button-container');
+            };
+            document.head.appendChild(script);
+        })
+        .catch(error => console.error('Error loading PayPal SDK:', error));
+</script>
+
 </head>
 <body>
     <h2>SC AHEAD Payments Portal</h2>
