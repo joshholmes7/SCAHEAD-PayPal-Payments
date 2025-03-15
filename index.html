@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payments | SC AHEAD</title>
+    <title>SC AHEAD Payments Portal</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -21,9 +21,7 @@
         input, select {
             width: 100%;
             padding: 5px;
-        }
-        #paypal-button-container {
-            margin-top: 20px;
+            margin-bottom: 10px;
         }
         #cart {
             margin-top: 20px;
@@ -33,15 +31,32 @@
             background: #f9f9f9;
             text-align: left;
         }
+        #paypal-button-container {
+            margin-top: 20px;
+        }
     </style>
     <script>
         let cartItems = [];
+        document.addEventListener("DOMContentLoaded", function () {
+            updateCart();
+        });
+
+        function updateCart() {
+            cartItems = [];
+            let donationAmount = Math.max(0, parseFloat(document.getElementById("donation-amount").value) || 0);
+            document.getElementById("donation-amount").value = donationAmount;
+            
+            if (donationAmount > 0) {
+                cartItems.push({ name: "Donation", price: donationAmount });
+            }
+            updateCartDisplay();
+        }
 
         function updateCartDisplay() {
             let cartDiv = document.getElementById("cart");
             cartDiv.innerHTML = "<h3>Shopping Cart</h3>";
             let total = 0;
-
+            
             if (cartItems.length === 0) {
                 cartDiv.innerHTML += "<p>Your cart is empty.</p>";
             } else {
@@ -51,39 +66,36 @@
                 });
                 cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
             }
-
             cartDiv.innerHTML += '<div id="paypal-button-container"></div>';
-            if (typeof paypal !== "undefined") {
-                paypal.Buttons().render('#paypal-button-container');
-            }
+            renderPayPalButton();
         }
 
-        async function loadPayPalScript() {
-            try {
-                const response = await fetch('/.netlify/functions/getPaypalClientId');
-                const data = await response.json();
-                const script = document.createElement('script');
-                script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
-                script.onload = () => {
-                    if (typeof paypal !== "undefined") {
-                        paypal.Buttons().render('#paypal-button-container');
-                    }
-                };
-                document.head.appendChild(script);
-            } catch (error) {
-                console.error("Error loading PayPal SDK:", error);
-            }
+        function renderPayPalButton() {
+            setTimeout(() => {
+                if (typeof paypal !== "undefined") {
+                    paypal.Buttons().render('#paypal-button-container');
+                }
+            }, 500);
         }
-
-        document.addEventListener("DOMContentLoaded", function () {
-            loadPayPalScript();
-            updateCartDisplay();
-        });
-
+    </script>
+    <script>
+    fetch('/.netlify/functions/getPaypalClientId')
+        .then(response => response.json())
+        .then(data => {
+            const script = document.createElement('script');
+            script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
+            script.onload = () => renderPayPalButton();
+            document.head.appendChild(script);
+        })
+        .catch(error => console.error('Error loading PayPal SDK:', error));
     </script>
 </head>
 <body>
     <h2>SC AHEAD Payments Portal</h2>
+    
+    <h3>Make a Donation</h3>
+    <input type="number" id="donation-amount" placeholder="Enter donation amount" oninput="updateCart()" min="0">
+    
     <div id="cart"></div>
 </body>
 </html>
