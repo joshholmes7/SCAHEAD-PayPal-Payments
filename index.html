@@ -38,7 +38,7 @@
         .donation-options {
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 15px;
         }
     </style>
 </head>
@@ -56,10 +56,10 @@
 
     <label><strong>Make a Donation</strong></label>
     <div class="donation-options">
-        <input type="radio" name="donation-amount" value="100" onchange="updateCart()"> $100
-        <input type="radio" name="donation-amount" value="500" onchange="updateCart()"> $500
-        <input type="radio" name="donation-amount" value="1000" onchange="updateCart()"> $1000
-        <input type="radio" name="donation-amount" id="donation-other" value="other" onchange="toggleDonationInput()"> Other
+        <label><input type="radio" name="donation-amount" value="100" onchange="updateCart()"> $100</label>
+        <label><input type="radio" name="donation-amount" value="500" onchange="updateCart()"> $500</label>
+        <label><input type="radio" name="donation-amount" value="1000" onchange="updateCart()"> $1000</label>
+        <label><input type="radio" name="donation-amount" id="donation-other" value="other" onchange="toggleDonationInput()"> Other</label>
     </div>
     <input type="number" id="donation-amount" min="0" placeholder="Enter Amount" onblur="updateCart()" disabled>
     <select id="donation-category" onchange="updateCart()">
@@ -71,7 +71,7 @@
     </select>
 
     <div id="cart"></div>
-    
+
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             let cartItems = [];
@@ -123,17 +123,6 @@
                     cartItems.push({ name: `Donation for ${donationCategory}`, price: parseFloat(document.getElementById("donation-amount").value) });
                 }
                 updateCartDisplay();
-            }
-
-            function updateCartDisplay() {
-                let cartDiv = document.getElementById("cart");
-                cartDiv.innerHTML = "<h3>Shopping Cart</h3>";
-                let total = 0;
-                cartItems.forEach(item => {
-                    cartDiv.innerHTML += `<p>${item.name}: $${item.price.toFixed(2)}</p>`;
-                    total += item.price;
-                });
-                cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
             }
             
             addRegistrations();
