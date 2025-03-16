@@ -41,10 +41,12 @@
             gap: 15px;
         }
     </style>
-    <script>
+<script>
     fetch('/.netlify/functions/get-paypal-client-id')
         .then(response => response.json())
         .then(data => {
+            if (!data.clientId) throw new Error("Invalid PayPal Client ID Response");
+
             const script = document.createElement("script");
             script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
             script.onload = renderPayPalButtons;
@@ -56,9 +58,7 @@
         paypal.Buttons({
             createOrder: function(data, actions) {
                 return actions.order.create({
-                    purchase_units: [{
-                        amount: { value: getTotal() }
-                    }]
+                    purchase_units: [{ amount: { value: getTotal() } }]
                 });
             },
             onApprove: function(data, actions) {
