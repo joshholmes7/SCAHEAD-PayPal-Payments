@@ -54,7 +54,39 @@
             float: right;
         }
     </style>
-    <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=USD"></script>
+    <script>
+        fetch('/.netlify/functions/getPaypalClientId')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.clientId) {
+                    throw new Error("Invalid PayPal Client ID Response");
+                }
+                const script = document.createElement("script");
+                script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
+                script.onload = renderPayPalButtons;
+                document.head.appendChild(script);
+            })
+            .catch(error => console.error("Error loading PayPal SDK:", error));
+
+        function renderPayPalButtons() {
+            paypal.Buttons({
+                createOrder: function(data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{ amount: { value: getTotal() } }]
+                    });
+                },
+                onApprove: function(data, actions) {
+                    return actions.order.capture().then(function(details) {
+                        alert('Transaction completed by ' + details.payer.name.given_name);
+                    });
+                }
+            }).render("#paypal-button-container");
+        }
+
+        function getTotal() {
+            return cartItems.reduce((sum, item) => sum + item.price, 0).toFixed(2);
+        }
+    </script>
 </head>
 <body>
     <img src="https://github.com/joshholmes7/SCAHEAD-PayPal-Payments/blob/main/SC%20AHEAD%20Logo%20Color%202024.png?raw=true" alt="SC AHEAD Logo" class="logo">
@@ -88,56 +120,5 @@
     <div class="paypal-container">
         <div id="paypal-button-container"></div>
     </div>
-
-    <script>
-        let cartItems = [];
-        let registrations = [];
-        let memberships = [];
-
-        function addRegistration() {
-            let index = registrations.length;
-            registrations.push({ name: "", institution: "" });
-            let container = document.getElementById("registration-container");
-            let div = document.createElement("div");
-            div.innerHTML = `
-                <h4>Conference Registration #${index + 1} <button class='remove-btn' onclick='removeItem(${index}, "registration")'>X</button></h4>
-                <select class="conference-type" onchange="updateCart()">
-                    <option value="25.00">Individual Member - $25.00</option>
-                    <option value="35.00">Individual Non-Member - $35.00</option>
-                </select>
-                <input type="text" class="registrant-name" placeholder="Full Name" oninput="updateCart()">
-                <input type="text" class="registrant-institution" placeholder="Institution" oninput="updateCart()">
-            `;
-            container.appendChild(div);
-            updateCart();
-        }
-
-        function addMembership() {
-            let index = memberships.length;
-            memberships.push({ name: "", institution: "" });
-            let container = document.getElementById("membership-container");
-            let div = document.createElement("div");
-            div.innerHTML = `
-                <h4>Membership #${index + 1} <button class='remove-btn' onclick='removeItem(${index}, "membership")'>X</button></h4>
-                <select class="membership-type" onchange="updateCart()">
-                    <option value="50.00">24-25 - $50.00</option>
-                    <option value="50.00">25-26 - $50.00</option>
-                </select>
-                <input type="text" class="member-name" placeholder="Full Name" oninput="updateCart()">
-                <input type="text" class="member-institution" placeholder="Institution" oninput="updateCart()">
-            `;
-            container.appendChild(div);
-            updateCart();
-        }
-
-        function removeItem(index, type) {
-            if (type === "registration") {
-                registrations.splice(index, 1);
-            } else if (type === "membership") {
-                memberships.splice(index, 1);
-            }
-            updateCart();
-        }
-    </script>
 </body>
 </html>
