@@ -138,6 +138,32 @@
             document.getElementById("membership-container").children[index].remove();
             updateCart();
         }
+
+        function updateCart() {
+            cartItems = [];
+            document.querySelectorAll(".conference-type").forEach((select, index) => {
+                let name = document.querySelectorAll(".registrant-name")[index]?.value || "";
+                let institution = document.querySelectorAll(".registrant-institution")[index]?.value || "";
+                cartItems.push({ name: `Conference Registration for ${name} (${institution})`, price: parseFloat(select.value) });
+            });
+            document.querySelectorAll(".membership-type").forEach((select, index) => {
+                let name = document.querySelectorAll(".member-name")[index]?.value || "";
+                let institution = document.querySelectorAll(".member-institution")[index]?.value || "";
+                cartItems.push({ name: `Membership for ${name} (${institution})`, price: parseFloat(select.value) });
+            });
+            updateCartDisplay();
+        }
+
+        function updateCartDisplay() {
+            let cartDiv = document.getElementById("cart");
+            cartDiv.innerHTML = "<h3>Shopping Cart</h3>";
+            let total = 0;
+            cartItems.forEach(item => {
+                cartDiv.innerHTML += `<p>${item.name}: $${item.price.toFixed(2)}</p>`;
+                total += item.price;
+            });
+            cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
+        }
     </script>
 </head>
 <body>
