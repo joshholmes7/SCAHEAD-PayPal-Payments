@@ -42,23 +42,39 @@
         }
     </style>
 <script>
-    fetch('/.netlify/functions/get-paypal-client-id')
+    // Fetch PayPal Client ID from Netlify function
+    fetch('/.netlify/functions/getPaypalClientId')
         .then(response => response.json())
         .then(data => {
-            if (!data.clientId) throw new Error("Invalid PayPal Client ID Response");
+            if (!data.clientId) {
+                throw new Error("Invalid PayPal Client ID Response");
+            }
 
+            // Dynamically create PayPal script
             const script = document.createElement("script");
             script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
-            script.onload = renderPayPalButtons;
+            script.onload = () => {
+                renderPayPalButtons();
+            };
+            script.onerror = () => {
+                console.error("Failed to load PayPal SDK script.");
+            };
             document.head.appendChild(script);
         })
         .catch(error => console.error("Error loading PayPal SDK:", error));
 
     function renderPayPalButtons() {
+        if (!paypal) {
+            console.error("PayPal SDK failed to load.");
+            return;
+        }
+        
         paypal.Buttons({
             createOrder: function(data, actions) {
                 return actions.order.create({
-                    purchase_units: [{ amount: { value: getTotal() } }]
+                    purchase_units: [{
+                        amount: { value: getTotal() }
+                    }]
                 });
             },
             onApprove: function(data, actions) {
