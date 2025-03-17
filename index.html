@@ -202,14 +202,15 @@ function validateFields() {
     cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
 
     document.getElementById("paypal-button-container").innerHTML = "";
+
     if (total > 0 && typeof paypal !== "undefined") {
         paypal.Buttons({
             onClick: function (data, actions) {
                 if (!validateFields()) {
                     alert("Please fill out all required fields before proceeding.");
-                    return actions.reject();
+                    return actions.reject(); // ⛔ Stop PayPal from opening if validation fails
                 }
-                return actions.resolve();
+                return actions.resolve(); // ✅ Allow PayPal to proceed if all fields are valid
             }
         }).render("#paypal-button-container");
     }
