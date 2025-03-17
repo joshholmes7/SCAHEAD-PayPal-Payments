@@ -275,16 +275,16 @@ function updateCartDisplay() {
     <select id="donation-category" onchange="updateCart()">
 
     <div class="donation-label">
-        <label for="donation-category">Donation Designation:</label>
-        <select id="donation-category" onchange="updateCart()">
-            <option value="">Select Designation</option>
-            <option value="Event Food">Event Food</option>
-            <option value="Event Facilities">Event Facilities</option>
-            <option value="Presenter Fees">Presenter Fees</option>
-            <option value="Annual Business Expenses">Annual Business Expenses</option>
-            <option value="SC AHEAD BOD Discretion">SC AHEAD BOD Discretion</option>
-        </select>
-    </div>
+    <label for="donation-category">Select Designation:</label>
+    <select id="donation-category" onchange="updateCart()">
+        <option value="" disabled selected>Select Designation</option>
+        <option value="Event Food">Event Food</option>
+        <option value="Event Facilities">Event Facilities</option>
+        <option value="Presenter Fees">Presenter Fees</option>
+        <option value="Annual Business Expenses">Annual Business Expenses</option>
+        <option value="SC AHEAD BOD Discretion">SC AHEAD BOD Discretion</option>
+    </select>
+</div>
 
     <div id="cart"></div>
     <div style="display: flex; justify-content: center;">
