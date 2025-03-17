@@ -128,7 +128,23 @@
                     price: parseFloat(select.value) 
                 });
             });
-
+ // Add Donations to Cart
+    let selectedDonation = document.querySelector('input[name="donation-amount"]:checked');
+    let donationAmount = 0;
+    if (selectedDonation) {
+        donationAmount = selectedDonation.value === "other"
+            ? parseFloat(document.getElementById("donation-amount").value) || 0
+            : parseFloat(selectedDonation.value);
+        
+        let donationCategory = document.getElementById("donation-category").value;
+        
+        if (donationAmount > 0 && donationCategory) {
+            cartItems.push({ 
+                name: `Donation - ${donationCategory}`, 
+                price: donationAmount 
+            });
+        }
+    }
             updateCartDisplay();
         }
 function validateFields() {
