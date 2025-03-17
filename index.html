@@ -77,57 +77,46 @@
 document.addEventListener("DOMContentLoaded", function () {
     let cartItems = [];
 
-    window.addRegistration = function () { // ⬅ Exposing function globally
-        let container = document.getElementById("registration-container");
-        let div = document.createElement("div");
-        div.innerHTML = `
-            <h4>Conference Registration</h4>
-            <select class="conference-type" onchange="updateCart()">
-                <option value="25.00">Individual Member - $25.00</option>
-                <option value="35.00">Individual Non-Member - $35.00</option>
-            </select>
-            <input type="text" class="registrant-name" placeholder="Name" oninput="updateCart()">
-            <input type="text" class="registrant-institution" placeholder="Institution" oninput="updateCart()">
-        `;
-        container.appendChild(div);
-        updateCart();
-    };
+    window.validateFields = function () { // ⬅ Exposing function globally
+        let allValid = true;
 
-    window.addMembership = function () { // ⬅ Exposing function globally
-        let container = document.getElementById("membership-container");
-        let div = document.createElement("div");
-        div.innerHTML = `
-            <h4>Membership</h4>
-            <select class="membership-type" onchange="updateCart()">
-                <option value="50.00">24-25 - $50.00</option>
-                <option value="50.00">25-26 - $50.00</option>
-            </select>
-            <input type="text" class="member-name" placeholder="Name" oninput="updateCart()">
-            <input type="text" class="member-institution" placeholder="Institution" oninput="updateCart()">
-        `;
-        container.appendChild(div);
-        updateCart();
-    };
-
-    window.updateCart = function () { // ⬅ Exposing function globally
-        cartItems = [];
-    
-        document.querySelectorAll(".conference-type").forEach((select, index) => {
-            let name = document.querySelectorAll(".registrant-name")[index]?.value || "";
-            let institution = document.querySelectorAll(".registrant-institution")[index]?.value || "";
-            cartItems.push({ name: `Conference Registration for ${name} (${institution})`, price: parseFloat(select.value) });
+        // Validate Registrations & Memberships
+        document.querySelectorAll(".conference-type, .registrant-name, .registrant-institution, .membership-type, .member-name, .member-institution").forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add("missing-field");
+                allValid = false;
+            } else {
+                field.classList.remove("missing-field");
+            }
         });
 
-        document.querySelectorAll(".membership-type").forEach((select, index) => {
-            let name = document.querySelectorAll(".member-name")[index]?.value || "";
-            let institution = document.querySelectorAll(".member-institution")[index]?.value || "";
-            cartItems.push({ name: `Membership for ${name} (${institution})`, price: parseFloat(select.value) });
-        });
+        // Validate Donations
+        let selectedDonation = document.querySelector('input[name="donation-amount"]:checked');
+        if (selectedDonation) {
+            let donationCategory = document.getElementById("donation-category");
+            if (!donationCategory.value.trim()) {
+                donationCategory.classList.add("missing-field");
+                allValid = false;
+            } else {
+                donationCategory.classList.remove("missing-field");
+            }
 
-        updateCartDisplay();
+            if (selectedDonation.value === "other") {
+                let otherAmount = document.getElementById("donation-amount");
+                if (!otherAmount.value.trim() || parseFloat(otherAmount.value) <= 0) {
+                    otherAmount.classList.add("missing-field");
+                    allValid = false;
+                } else {
+                    otherAmount.classList.remove("missing-field");
+                }
+            }
+        }
+
+        return allValid; // ✅ Ensuring validateFields is properly defined
     };
 
-    window.updateCartDisplay = function () { // ⬅ Exposing function globally
+    // ✅ Ensure `updateCartDisplay` calls `validateFields` correctly
+    window.updateCartDisplay = function () {
         let cartDiv = document.getElementById("cart");
         cartDiv.innerHTML = "<h3>Shopping Cart</h3>";
 
@@ -186,7 +175,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }).render("#paypal-button-container");
         }
     };
-
+});
     window.removeItem = function (index) { // ⬅ Exposing function globally
         let removedItem = cartItems[index];
         cartItems.splice(index, 1);
