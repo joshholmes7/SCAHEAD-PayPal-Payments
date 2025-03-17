@@ -181,7 +181,20 @@ function validateFields() {
             }
         }
     }
-
+function toggleDonationInput() {
+    let otherAmountInput = document.getElementById("donation-amount");
+    let isOtherSelected = document.getElementById("donation-other").checked;
+    
+    // Enable the input only if "Other" is selected
+    otherAmountInput.disabled = !isOtherSelected;
+    
+    // Clear the input when switching away from "Other"
+    if (!isOtherSelected) {
+        otherAmountInput.value = "";
+    }
+    
+    updateCart();
+}
     return allValid;
 }
 function updateCartDisplay() {
@@ -271,20 +284,19 @@ function updateCartDisplay() {
         <label><input type="radio" name="donation-amount" value="1000" onchange="updateCart()"> $1000</label>
         <label><input type="radio" name="donation-amount" id="donation-other" value="other" onchange="toggleDonationInput()"> Other</label>
     </div>
-    <input type="number" id="donation-amount" min="0" placeholder="Enter Amount" oninput="updateCart()" disabled>
-    <select id="donation-category" onchange="updateCart()">
+    <label><input type="radio" name="donation-amount" id="donation-other" value="other" onchange="toggleDonationInput()"> Other</label>
 
     <div class="donation-label">
     <label for="donation-category">Select Designation:</label>
-    <select id="donation-category" onchange="updateCart()">
-        <option value="" disabled selected>Select Designation</option>
-        <option value="Event Food">Event Food</option>
-        <option value="Event Facilities">Event Facilities</option>
-        <option value="Presenter Fees">Presenter Fees</option>
-        <option value="Annual Business Expenses">Annual Business Expenses</option>
-        <option value="SC AHEAD BOD Discretion">SC AHEAD BOD Discretion</option>
-    </select>
 </div>
+<select id="donation-category" onchange="updateCart()">
+    <option value="" disabled selected>Select Designation</option>
+    <option value="Event Food">Event Food</option>
+    <option value="Event Facilities">Event Facilities</option>
+    <option value="Presenter Fees">Presenter Fees</option>
+    <option value="Annual Business Expenses">Annual Business Expenses</option>
+    <option value="SC AHEAD BOD Discretion">SC AHEAD BOD Discretion</option>
+</select>
 
     <div id="cart"></div>
     <div style="display: flex; justify-content: center;">
