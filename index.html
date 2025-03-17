@@ -175,8 +175,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }).render("#paypal-button-container");
         }
     };
-});
-    window.removeItem = function (index) { // ⬅ Exposing function globally
+window.removeItem = function (index) { // ⬅ Exposing function globally
         let removedItem = cartItems[index];
         cartItems.splice(index, 1);
         updateCartDisplay();
@@ -212,7 +211,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 const script = document.createElement("script");
                 script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
-                script.onload = () => updateCartDisplay();
+                script.onload = () => window.updateCartDisplay();
                 document.head.appendChild(script);
             })
             .catch(error => console.error("Error loading PayPal SDK:", error));
