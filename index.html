@@ -252,7 +252,7 @@ function validateFields() {
         <label><input type="radio" name="donation-amount" value="1000" onchange="updateCart()"> $1000</label>
         <label><input type="radio" name="donation-amount" id="donation-other" value="other" onchange="toggleDonationInput()"> Other</label>
     </div>
-    <input type="number" id="donation-amount" min="0" placeholder="Enter Amount" onblur="updateCart()" disabled>
+    <input type="number" id="donation-amount" min="0" placeholder="Enter Amount" oninput="updateCart()" disabled>
 
     <div class="donation-label">
         <label for="donation-category">Donation Designation:</label>
