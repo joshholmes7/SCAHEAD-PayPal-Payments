@@ -109,26 +109,29 @@
         }
 
         function updateCart() {
-            cartItems = [];
+    cartItems = [];
 
-            document.querySelectorAll(".conference-type").forEach((select, index) => {
-                let name = document.querySelectorAll(".registrant-name")[index]?.value || "";
-                let institution = document.querySelectorAll(".registrant-institution")[index]?.value || "";
-                cartItems.push({ 
-                    name: `Conference Registration for ${name} (${institution})`, 
-                    price: parseFloat(select.value) 
-                });
-            });
+    // Add Registrations to Cart
+    document.querySelectorAll(".conference-type").forEach((select, index) => {
+        let name = document.querySelectorAll(".registrant-name")[index]?.value || "";
+        let institution = document.querySelectorAll(".registrant-institution")[index]?.value || "";
+        cartItems.push({ 
+            name: `Conference Registration for ${name} (${institution})`, 
+            price: parseFloat(select.value) 
+        });
+    });
 
-            document.querySelectorAll(".membership-type").forEach((select, index) => {
-                let name = document.querySelectorAll(".member-name")[index]?.value || "";
-                let institution = document.querySelectorAll(".member-institution")[index]?.value || "";
-                cartItems.push({ 
-                    name: `Membership for ${name} (${institution})`, 
-                    price: parseFloat(select.value) 
-                });
-            });
- // Add Donations to Cart
+    // Add Memberships to Cart
+    document.querySelectorAll(".membership-type").forEach((select, index) => {
+        let name = document.querySelectorAll(".member-name")[index]?.value || "";
+        let institution = document.querySelectorAll(".member-institution")[index]?.value || "";
+        cartItems.push({ 
+            name: `Membership for ${name} (${institution})`, 
+            price: parseFloat(select.value) 
+        });
+    });
+
+    // Add Donations to Cart
     let selectedDonation = document.querySelector('input[name="donation-amount"]:checked');
     let donationAmount = 0;
     if (selectedDonation) {
@@ -145,8 +148,9 @@
             });
         }
     }
-            updateCartDisplay();
-        }
+
+    updateCartDisplay();
+}
 function validateFields() {
     let allValid = true;
 
@@ -184,15 +188,15 @@ function validateFields() {
 function toggleDonationInput() {
     let otherAmountInput = document.getElementById("donation-amount");
     let isOtherSelected = document.getElementById("donation-other").checked;
-    
-    // Enable the input only if "Other" is selected
+
+    // Enable input only if "Other" is selected
     otherAmountInput.disabled = !isOtherSelected;
-    
-    // Clear the input when switching away from "Other"
+
+    // Clear input when switching away from "Other"
     if (!isOtherSelected) {
         otherAmountInput.value = "";
     }
-    
+
     updateCart();
 }
     return allValid;
@@ -278,15 +282,18 @@ function updateCartDisplay() {
     <div id="membership-container"></div>
 
     <h3>Make a Donation</h3>
-    <div class="donation-options">
-        <label><input type="radio" name="donation-amount" value="100" onchange="updateCart()"> $100</label>
-        <label><input type="radio" name="donation-amount" value="500" onchange="updateCart()"> $500</label>
-        <label><input type="radio" name="donation-amount" value="1000" onchange="updateCart()"> $1000</label>
-        <label><input type="radio" name="donation-amount" id="donation-other" value="other" onchange="toggleDonationInput()"> Other</label>
-    </div>
+<div class="donation-options">
+    <label><input type="radio" name="donation-amount" value="100" onchange="updateCart()"> $100</label>
+    <label><input type="radio" name="donation-amount" value="500" onchange="updateCart()"> $500</label>
+    <label><input type="radio" name="donation-amount" value="1000" onchange="updateCart()"> $1000</label>
     <label><input type="radio" name="donation-amount" id="donation-other" value="other" onchange="toggleDonationInput()"> Other</label>
+</div>
 
-    <div class="donation-label">
+<!-- Custom amount input for "Other" donation -->
+<input type="number" id="donation-amount" min="0" placeholder="Enter Amount" oninput="updateCart()" disabled>
+
+<!-- Donation Designation Dropdown -->
+<div class="donation-label">
     <label for="donation-category">Select Designation:</label>
 </div>
 <select id="donation-category" onchange="updateCart()">
