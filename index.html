@@ -105,6 +105,12 @@
             updateCart();
         }
 
+        function toggleDonationInput() {
+            let otherInput = document.getElementById("donation-amount");
+            otherInput.disabled = !document.getElementById("donation-other").checked;
+            updateCart();
+        }
+
         function updateCart() {
             cartItems = [];
 
@@ -125,6 +131,22 @@
                     price: parseFloat(select.value) 
                 });
             });
+
+            let selectedDonation = document.querySelector('input[name="donation-amount"]:checked');
+            let donationAmount = selectedDonation 
+                ? (selectedDonation.value === "other" 
+                    ? parseFloat(document.getElementById("donation-amount").value) || 0 
+                    : parseFloat(selectedDonation.value))
+                : 0;
+
+            let donationCategory = document.getElementById("donation-category").value;
+
+            if (donationAmount > 0) {
+                cartItems.push({ 
+                    name: `Donation - ${donationCategory}`, 
+                    price: donationAmount 
+                });
+            }
 
             updateCartDisplay();
         }
@@ -174,7 +196,6 @@
     </div>
     <input type="number" id="donation-amount" min="0" placeholder="Enter Amount" onblur="updateCart()" disabled>
 
-    <!-- Donation Designation Label -->
     <div class="donation-label">
         <label for="donation-category">Donation Designation:</label>
         <select id="donation-category" onchange="updateCart()">
