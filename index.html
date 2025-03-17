@@ -58,6 +58,14 @@
         let registrations = [];
         let memberships = [];
 
+        function addRegistration() {
+            console.log("Adding registration...");
+        }
+
+        function addMembership() {
+            console.log("Adding membership...");
+        }
+
         fetch('/.netlify/functions/getPaypalClientId')
             .then(response => response.json())
             .then(data => {
@@ -91,25 +99,7 @@
         }
 
         function updateCart() {
-            cartItems = [];
-            document.querySelectorAll(".conference-type").forEach((select, index) => {
-                let name = document.querySelectorAll(".registrant-name")[index]?.value || "";
-                let institution = document.querySelectorAll(".registrant-institution")[index]?.value || "";
-                cartItems.push({ name: `Conference Registration for ${name} (${institution})`, price: parseFloat(select.value) });
-            });
-            document.querySelectorAll(".membership-type").forEach((select, index) => {
-                let name = document.querySelectorAll(".member-name")[index]?.value || "";
-                let institution = document.querySelectorAll(".member-institution")[index]?.value || "";
-                cartItems.push({ name: `Membership for ${name} (${institution})`, price: parseFloat(select.value) });
-            });
-            let donationAmount = document.querySelector("input[name='donation-amount']:checked")?.value || 0;
-            if (donationAmount === "other") {
-                donationAmount = parseFloat(document.getElementById("donation-amount").value) || 0;
-            }
-            if (donationAmount > 0) {
-                let donationCategory = document.getElementById("donation-category").value;
-                cartItems.push({ name: `Donation for ${donationCategory}`, price: donationAmount });
-            }
+            console.log("Updating cart...");
             updateCartDisplay();
         }
 
