@@ -31,6 +31,10 @@
             border-radius: 3px;
             width: auto;
         }
+        .logo {
+            max-width: 200px;
+            margin-bottom: 20px;
+        }
         .donation-options {
             display: flex;
             justify-content: center;
@@ -173,16 +177,8 @@
     </script>
 </head>
 <body>
+    <img src="logo.png" alt="SC AHEAD Logo" class="logo">
     <h2>SC AHEAD Payments Portal</h2>
-    <button onclick="addRegistration()">Add Registration</button>
-    <div id="registration-container"></div>
-
-    <button onclick="addMembership()">Add Membership</button>
-    <div id="membership-container"></div>
-
-    <button onclick="addDonation()">Add Donation</button>
-    <div id="donation-container"></div>
-
     <div id="cart"></div>
     <div id="paypal-button-container"></div>
 </body>
