@@ -74,6 +74,7 @@
 }
     </style>
     <script>
+document.addEventListener("DOMContentLoaded", function () {
         let cartItems = [];
 
         function addRegistration() {
@@ -240,7 +241,7 @@ function updateCartDisplay() {
             custom_id: JSON.stringify(purchaseDetails) // Send details as metadata
         }]
     });
-}
+},
             onClick: function (data, actions) {
                 if (!validateFields()) {
                     alert("Please fill out all required fields before proceeding.");
@@ -297,6 +298,7 @@ function removeItem(index) {
         document.getElementById("donation-category").value = "";
     }
 }
+});
         // Fetch PayPal Client ID from Netlify function
         fetch('/.netlify/functions/getPaypalClientId')
             .then(response => response.json())
