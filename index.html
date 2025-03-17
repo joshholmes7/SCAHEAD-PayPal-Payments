@@ -51,7 +51,6 @@
             border: none;
             padding: 5px;
             cursor: pointer;
-            float: right;
         }
     </style>
     <script>
@@ -91,57 +90,6 @@
             return cartItems.reduce((sum, item) => sum + item.price, 0).toFixed(2);
         }
 
-        function addRegistration() {
-            let container = document.getElementById("registration-container");
-            let div = document.createElement("div");
-            div.innerHTML = `
-                <h4>Conference Registration</h4>
-                <select class="conference-type" onchange="updateCart()">
-                    <option value="25.00">Individual Member - $25.00</option>
-                    <option value="35.00">Individual Non-Member - $35.00</option>
-                </select>
-                <input type="text" class="registrant-name" placeholder="Full Name" oninput="updateCart()">
-                <input type="text" class="registrant-institution" placeholder="Institution" oninput="updateCart()">
-            `;
-            container.appendChild(div);
-            updateCart();
-        }
-
-        function addMembership() {
-            let container = document.getElementById("membership-container");
-            let div = document.createElement("div");
-            div.innerHTML = `
-                <h4>Membership</h4>
-                <select class="membership-type" onchange="updateCart()">
-                    <option value="50.00">24-25 - $50.00</option>
-                    <option value="50.00">25-26 - $50.00</option>
-                </select>
-                <input type="text" class="member-name" placeholder="Full Name" oninput="updateCart()">
-                <input type="text" class="member-institution" placeholder="Institution" oninput="updateCart()">
-            `;
-            container.appendChild(div);
-            updateCart();
-        }
-
-        function updateCartDisplay() {
-            let cartDiv = document.getElementById("cart");
-            cartDiv.innerHTML = "<h3>Shopping Cart</h3>";
-            let total = 0;
-            cartItems.forEach((item, index) => {
-                cartDiv.innerHTML += `<p>${item.name}: $${item.price.toFixed(2)} <button onclick='removeItem(${index})' class='remove-btn'>X</button></p>`;
-                total += item.price;
-            });
-            cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
-            let cartDiv = document.getElementById("cart");
-            cartDiv.innerHTML = "<h3>Shopping Cart</h3>";
-            let total = 0;
-            cartItems.forEach(item => {
-                cartDiv.innerHTML += `<p>${item.name}: $${item.price.toFixed(2)}</p>`;
-                total += item.price;
-            });
-            cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
-        }
-
         function updateCart() {
             cartItems = [];
             document.querySelectorAll(".conference-type").forEach((select, index) => {
@@ -154,23 +102,30 @@
                 let institution = document.querySelectorAll(".member-institution")[index]?.value || "";
                 cartItems.push({ name: `Membership for ${name} (${institution})`, price: parseFloat(select.value) });
             });
+            let donationAmount = document.querySelector("input[name='donation-amount']:checked")?.value || 0;
+            if (donationAmount === "other") {
+                donationAmount = parseFloat(document.getElementById("donation-amount").value) || 0;
+            }
+            if (donationAmount > 0) {
+                let donationCategory = document.getElementById("donation-category").value;
+                cartItems.push({ name: `Donation for ${donationCategory}`, price: donationAmount });
+            }
             updateCartDisplay();
+        }
+
+        function updateCartDisplay() {
+            let cartDiv = document.getElementById("cart");
+            cartDiv.innerHTML = "<h3>Shopping Cart</h3>";
+            let total = 0;
+            cartItems.forEach((item, index) => {
+                cartDiv.innerHTML += `<p>${item.name}: $${item.price.toFixed(2)} <button onclick='removeItem(${index})' class='remove-btn'>X</button></p>`;
+                total += item.price;
+            });
+            cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
         }
 
         function removeItem(index) {
             cartItems.splice(index, 1);
-            updateCartDisplay();
-            cartItems = [];
-            document.querySelectorAll(".conference-type").forEach((select, index) => {
-                let name = document.querySelectorAll(".registrant-name")[index]?.value || "";
-                let institution = document.querySelectorAll(".registrant-institution")[index]?.value || "";
-                cartItems.push({ name: `Conference Registration for ${name} (${institution})`, price: parseFloat(select.value) });
-            });
-            document.querySelectorAll(".membership-type").forEach((select, index) => {
-                let name = document.querySelectorAll(".member-name")[index]?.value || "";
-                let institution = document.querySelectorAll(".member-institution")[index]?.value || "";
-                cartItems.push({ name: `Membership for ${name} (${institution})`, price: parseFloat(select.value) });
-            });
             updateCartDisplay();
         }
     </script>
@@ -184,6 +139,7 @@
     <h3>Memberships</h3>
     <button onclick="addMembership()">Add Membership</button>
     <div id="membership-container"></div>
+    <h3>Make a Donation</h3>
     <div id="cart"></div>
     <div class="paypal-container">
         <div id="paypal-button-container"></div>
