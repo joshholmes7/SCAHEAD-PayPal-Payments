@@ -184,11 +184,13 @@ function validateFields() {
 
     return allValid;
 }
-        function updateCartDisplay() {
+function updateCartDisplay() {
     let cartDiv = document.getElementById("cart");
     cartDiv.innerHTML = "<h3>Shopping Cart</h3>";
 
     let total = 0;
+    let purchaseDetails = [];
+
     cartItems.forEach((item, index) => {
         cartDiv.innerHTML += `
             <div class="cart-item">
@@ -197,6 +199,12 @@ function validateFields() {
             </div>
         `;
         total += item.price;
+
+        // Store item details for PayPal metadata
+        purchaseDetails.push({
+            name: item.name,
+            price: item.price.toFixed(2),
+        });
     });
 
     cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
@@ -204,9 +212,17 @@ function validateFields() {
     let paypalContainer = document.getElementById("paypal-button-container");
     paypalContainer.innerHTML = "";
 
-    // Ensure PayPal buttons only show when all fields are valid
     if (total > 0 && typeof paypal !== "undefined" && validateFields()) {
         paypal.Buttons({
+            createOrder: function (data, actions) {
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: { value: total.toFixed(2) },
+                        description: "SC AHEAD Purchase",
+                        custom_id: JSON.stringify(purchaseDetails) // Send details as custom metadata
+                    }]
+                });
+            },
             onClick: function (data, actions) {
                 if (!validateFields()) {
                     alert("Please fill out all required fields before proceeding.");
