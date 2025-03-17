@@ -257,16 +257,22 @@ window.removeItem = function (index) { // ⬅ Exposing function globally
 });
         // Fetch PayPal Client ID from Netlify function
         fetch('/.netlify/functions/getPaypalClientId')
-            .then(response => response.json())
-            .then(data => {
-                if (!data.clientId) throw new Error("Invalid PayPal Client ID Response");
+    .then(response => response.json())
+    .then(data => {
+        if (!data.clientId) throw new Error("Invalid PayPal Client ID Response");
 
-                const script = document.createElement("script");
-                script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
-                script.onload = () => window.updateCartDisplay();
-                document.head.appendChild(script);
-            })
-            .catch(error => console.error("Error loading PayPal SDK:", error));
+        // Prevent duplicate script injection
+        if (!document.querySelector('script[src*="paypal.com/sdk/js"]')) {
+            const script = document.createElement("script");
+            script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
+            script.onload = () => window.updateCartDisplay();
+            document.head.appendChild(script);
+        } else {
+            console.log("PayPal script already loaded");
+            window.updateCartDisplay(); // Ensure the buttons load
+        }
+    })
+    .catch(error => console.error("Error loading PayPal SDK:", error));
     </script>
 </head>
 <body>
