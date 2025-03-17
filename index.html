@@ -1,193 +1,113 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SC AHEAD Payments Portal</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        h2, h3 {
-            color: #003366;
-        }
-        input, select, button {
-            width: 100%;
-            padding: 5px;
-            margin-bottom: 10px;
-        }
-        #cart {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background: #f9f9f9;
-            text-align: left;
-        }
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 5px;
-        }
-        .remove-btn {
-            background: red;
-            color: white;
-            border: none;
-            padding: 3px 7px;
-            cursor: pointer;
-            border-radius: 3px;
-        }
-        .logo {
-            max-width: 200px;
-            margin-bottom: 20px;
-        }
-        .donation-options {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-        #paypal-button-container {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
-    </style>
-    <script>
-        fetch('/.netlify/functions/getPaypalClientId')
-            .then(response => response.json())
-            .then(data => {
-                if (!data.clientId) {
-                    throw new Error("Invalid PayPal Client ID Response");
-                }
-                const script = document.createElement("script");
-                script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
-                script.onload = () => renderPayPalButtons();
-                script.onerror = () => console.error("Failed to load PayPal SDK script.");
-                document.head.appendChild(script);
-            })
-            .catch(error => console.error("Error loading PayPal SDK:", error));
+<style>
+    /* Fix remove button size */
+    .remove-btn {
+        background: red;
+        color: white;
+        border: none;
+        padding: 3px 7px;
+        cursor: pointer;
+        border-radius: 3px;
+        width: auto; /* Fix issue */
+    }
 
-        function renderPayPalButtons() {
-            if (typeof paypal === "undefined") {
-                console.error("PayPal SDK failed to load.");
-                return;
-            }
+    .donation-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+    }
+</style>
 
-            paypal.Buttons({
-                createOrder: (data, actions) => {
-                    return actions.order.create({
-                        purchase_units: [{
-                            amount: { value: getTotal() }
-                        }]
-                    });
-                },
-                onApprove: (data, actions) => {
-                    return actions.order.capture().then(details => {
-                        alert('Transaction completed by ' + details.payer.name.given_name);
-                    });
-                }
-            }).render("#paypal-button-container");
-        }
+<script>
+    function addRegistration() {
+        let index = registrations.length;
+        registrations.push({ name: "", institution: "" });
 
-        let cartItems = [];
+        let container = document.getElementById("registration-container");
+        let div = document.createElement("div");
+        div.innerHTML = `
+            <h4>Conference Registration #${index + 1}</h4>
+            <select class="conference-type" onchange="updateCart()">
+                <option value="25.00">Individual Member - $25.00</option>
+                <option value="35.00">Individual Non-Member - $35.00</option>
+            </select>
+            <input type="text" class="registrant-name" placeholder="Name" oninput="updateCart()">
+            <input type="text" class="registrant-institution" placeholder="Institution" oninput="updateCart()">
+        `;
+        container.appendChild(div);
+        updateCart();
+    }
 
-        function addRegistration() {
-            cartItems.push({ type: "registration", name: "Conference Registration", price: 25.00 });
-            updateCart();
-        }
+    function addMembership() {
+        let index = memberships.length;
+        memberships.push({ name: "", institution: "" });
 
-        function addMembership() {
-            cartItems.push({ type: "membership", name: "Membership", price: 50.00 });
-            updateCart();
-        }
+        let container = document.getElementById("membership-container");
+        let div = document.createElement("div");
+        div.innerHTML = `
+            <h4>Membership #${index + 1}</h4>
+            <select class="membership-type" onchange="updateCart()">
+                <option value="50.00">24-25 - $50.00</option>
+                <option value="50.00">25-26 - $50.00</option>
+            </select>
+            <input type="text" class="member-name" placeholder="Name" oninput="updateCart()">
+            <input type="text" class="member-institution" placeholder="Institution" oninput="updateCart()">
+        `;
+        container.appendChild(div);
+        updateCart();
+    }
 
-        function toggleDonationInput() {
-            document.getElementById("donation-amount").disabled = !document.getElementById("donation-other").checked;
-            updateCart();
-        }
+    function updateCart() {
+        cartItems = [];
 
-        function addDonation() {
-            let selectedAmount = document.querySelector('input[name="donation-amount"]:checked');
-            let donationAmount = selectedAmount ? (selectedAmount.value === "other" 
-                ? parseFloat(document.getElementById("donation-amount").value) || 0 
-                : parseFloat(selectedAmount.value)) 
-                : 0;
-
-            let donationCategory = document.getElementById("donation-category").value;
-
-            if (donationAmount > 0) {
-                cartItems.push({ type: "donation", name: `Donation - ${donationCategory}`, price: donationAmount });
-                updateCart();
-            }
-        }
-
-        function removeItem(index) {
-            cartItems.splice(index, 1);
-            updateCart();
-        }
-
-        function updateCart() {
-            let cartDiv = document.getElementById("cart");
-            cartDiv.innerHTML = "<h3>Shopping Cart</h3>";
-
-            let total = 0;
-            cartItems.forEach((item, index) => {
-                cartDiv.innerHTML += `
-                    <div class="cart-item">
-                        <span>${item.name}: $${item.price.toFixed(2)}</span>
-                        <button class="remove-btn" onclick="removeItem(${index})">X</button>
-                    </div>
-                `;
-                total += item.price;
+        document.querySelectorAll(".conference-type").forEach((select, index) => {
+            let name = document.querySelectorAll(".registrant-name")[index]?.value || "";
+            let institution = document.querySelectorAll(".registrant-institution")[index]?.value || "";
+            cartItems.push({ 
+                name: `Conference Registration for ${name} (${institution})`, 
+                price: parseFloat(select.value) 
             });
+        });
 
-            cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
-        }
+        document.querySelectorAll(".membership-type").forEach((select, index) => {
+            let name = document.querySelectorAll(".member-name")[index]?.value || "";
+            let institution = document.querySelectorAll(".member-institution")[index]?.value || "";
+            cartItems.push({ 
+                name: `Membership for ${name} (${institution})`, 
+                price: parseFloat(select.value) 
+            });
+        });
 
-        function getTotal() {
-            return cartItems.length ? cartItems.reduce((sum, item) => sum + item.price, 0).toFixed(2) : "0.00";
-        }
-    </script>
-</head>
-<body>
-    <img src="https://github.com/joshholmes7/SCAHEAD-PayPal-Payments/blob/main/SC%20AHEAD%20Logo%20Color%202024.png?raw=true" alt="SC AHEAD Logo" class="logo">
-    <h2>SC AHEAD Payments Portal</h2>
+        updateCartDisplay();
+    }
 
-    <h3>Conference Registrations</h3>
-    <button onclick="addRegistration()">Add Registration</button>
+    function updateCartDisplay() {
+        let cartDiv = document.getElementById("cart");
+        cartDiv.innerHTML = "<h3>Shopping Cart</h3>";
 
-    <h3>Memberships</h3>
-    <button onclick="addMembership()">Add Membership</button>
+        let total = 0;
+        cartItems.forEach((item, index) => {
+            cartDiv.innerHTML += `
+                <div class="cart-item">
+                    <span>${item.name}: $${item.price.toFixed(2)}</span>
+                    <button class="remove-btn" onclick="removeItem(${index})">X</button>
+                </div>
+            `;
+            total += item.price;
+        });
 
-    <h3>Make a Donation</h3>
-    <div class="donation-options">
-        <label><input type="radio" name="donation-amount" value="100"> $100</label>
-        <label><input type="radio" name="donation-amount" value="500"> $500</label>
-        <label><input type="radio" name="donation-amount" value="1000"> $1000</label>
-        <label><input type="radio" name="donation-amount" id="donation-other" value="other" onchange="toggleDonationInput()"> Other</label>
-    </div>
-    <input type="number" id="donation-amount" min="0" placeholder="Enter Amount" disabled>
+        cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
+    }
+</script>
 
-    <h3>Donation Designation</h3>
-    <select id="donation-category">
+<!-- Donation Label Fix -->
+<div class="donation-label">
+    <label for="donation-category">Donation Designation:</label>
+    <select id="donation-category" onchange="updateCart()">
         <option value="Event Food">Event Food</option>
         <option value="Event Facilities">Event Facilities</option>
         <option value="Presenter Fees">Presenter Fees</option>
         <option value="Annual Business Expenses">Annual Business Expenses</option>
         <option value="SC AHEAD BOD Discretion">SC AHEAD BOD Discretion</option>
     </select>
-    <button onclick="addDonation()">Add Donation</button>
-
-    <div id="cart"></div>
-
-    <div id="paypal-button-container"></div>
-</body>
-</html>
+</div>
