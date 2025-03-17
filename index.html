@@ -242,20 +242,29 @@ window.toggleDonationInput = function () {
                 return actions.resolve();
             },
             onApprove: function (data, actions) {
-                return actions.order.capture().then(function (details) {
-                    alert("Thank you! Your payment was successfully processed.");
+    return actions.order.capture().then(function (details) {
+        alert("Thank you! Your payment was successfully processed.");
 
-                    cartItems = [];
-                    document.getElementById("registration-container").innerHTML = "";
-                    document.getElementById("membership-container").innerHTML = "";
-                    document.querySelectorAll('input[name="donation-amount"]').forEach(radio => radio.checked = false);
-                    document.getElementById("donation-amount").value = "";
-                    document.getElementById("donation-amount").disabled = true;
-                    document.getElementById("donation-category").value = "";
+        // ✅ Close the PayPal popup
+        if (window.opener) {
+            window.opener.postMessage("paypal-close", "*");
+            window.close();
+        }
 
-                    updateCartDisplay();
-                });
-            }
+        cartItems = [];
+        document.getElementById("registration-container").innerHTML = "";
+        document.getElementById("membership-container").innerHTML = "";
+        document.querySelectorAll('input[name="donation-amount"]').forEach(radio => radio.checked = false);
+        document.getElementById("donation-amount").value = "";
+        document.getElementById("donation-amount").disabled = true;
+        document.getElementById("donation-category").value = "";
+
+        updateCartDisplay();
+    }).catch(function (error) {
+        console.error("❌ Payment Error:", error);
+        alert("An issue occurred while processing your payment.");
+    });
+}
         }).render("#paypal-button-container");
     } else {
         console.warn("⚠️ PayPal SDK not loaded or total is 0.");
