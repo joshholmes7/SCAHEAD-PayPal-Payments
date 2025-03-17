@@ -176,31 +176,17 @@ function validateFields() {
         }
 
         if (selectedDonation.value === "other") {
-    let otherAmount = document.getElementById("donation-amount");
-    if (!otherAmount.value.trim() || parseFloat(otherAmount.value) <= 0) {
-        otherAmount.classList.add("missing-field");
-        allValid = false;
-    } else {
-        otherAmount.classList.remove("missing-field");
-    }
-} else {
-    // If a preset amount is selected, remove error styles from "Enter Amount" field
-    document.getElementById("donation-amount").classList.remove("missing-field");
-}
-    let otherAmountInput = document.getElementById("donation-amount");
-    let isOtherSelected = document.getElementById("donation-other").checked;
-
-    // Enable input if "Other" is selected, disable otherwise
-    otherAmountInput.disabled = !isOtherSelected;
-
-    // Clear the input when switching away from "Other"
-    if (!isOtherSelected) {
-        otherAmountInput.value = "";
+            let otherAmount = document.getElementById("donation-amount");
+            if (!otherAmount.value.trim() || parseFloat(otherAmount.value) <= 0) {
+                otherAmount.classList.add("missing-field");
+                allValid = false;
+            } else {
+                otherAmount.classList.remove("missing-field");
+            }
+        }
     }
 
-    updateCart();
-}
-    return allValid;
+    return allValid; // ✅ No updateCart() call inside validateFields()
 }
 function toggleDonationInput() {
     let otherAmountInput = document.getElementById("donation-amount");
@@ -242,27 +228,31 @@ function updateCartDisplay() {
     cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
 
     let paypalContainer = document.getElementById("paypal-button-container");
-    paypalContainer.innerHTML = "";
+
+    // **🔹 Only clear PayPal buttons if necessary to prevent flickering**
+    if (paypalContainer.innerHTML.trim() !== "") {
+        paypalContainer.innerHTML = "";
+    }
 
     if (total > 0 && typeof paypal !== "undefined" && validateFields()) {
         paypal.Buttons({
-            createOrder: function (data, actions) {
-                return actions.order.create({
-                    purchase_units: [{
-                        amount: { value: total.toFixed(2) },
-                        description: "SC AHEAD Purchase",
-                        custom_id: JSON.stringify(purchaseDetails) // Send details as custom metadata
-                    }]
-                });
-            },
-            onClick: function (data, actions) {
-                if (!validateFields()) {
-                    alert("Please fill out all required fields before proceeding.");
-                    return actions.reject();
-                }
-                return actions.resolve();
-            }
-        }).render("#paypal-button-container");
+    createOrder: function (data, actions) {
+        return actions.order.create({
+            purchase_units: [{
+                amount: { value: total.toFixed(2) },
+                description: "SC AHEAD Purchase",
+                custom_id: JSON.stringify(purchaseDetails) // Send details as custom metadata
+            }]
+        });
+    },
+    onClick: function (data, actions) {
+        if (!validateFields()) {
+            alert("Please fill out all required fields before proceeding.");
+            return actions.reject(); // ✅ Prevent payment, but keep button visible
+        }
+        return actions.resolve();
+    }
+}).render("#paypal-button-container");
     }
 }
         function removeItem(index) {
