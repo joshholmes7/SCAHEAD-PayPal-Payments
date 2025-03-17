@@ -111,17 +111,33 @@ window.addMembership = function () {
 window.updateCart = function () { 
     cartItems = [];
 
+    // Add Conference Registrations
     document.querySelectorAll(".conference-type").forEach((select, index) => {
         let name = document.querySelectorAll(".registrant-name")[index]?.value || "";
         let institution = document.querySelectorAll(".registrant-institution")[index]?.value || "";
         cartItems.push({ name: `Conference Registration for ${name} (${institution})`, price: parseFloat(select.value) });
     });
 
+    // Add Memberships
     document.querySelectorAll(".membership-type").forEach((select, index) => {
         let name = document.querySelectorAll(".member-name")[index]?.value || "";
         let institution = document.querySelectorAll(".member-institution")[index]?.value || "";
         cartItems.push({ name: `Membership for ${name} (${institution})`, price: parseFloat(select.value) });
     });
+
+    // ✅ Add Donations
+    let selectedDonation = document.querySelector('input[name="donation-amount"]:checked');
+    if (selectedDonation) {
+        let donationAmount = selectedDonation.value === "other" 
+            ? parseFloat(document.getElementById("donation-amount").value || "0") 
+            : parseFloat(selectedDonation.value);
+
+        let donationCategory = document.getElementById("donation-category").value || "General";
+
+        if (donationAmount > 0) {
+            cartItems.push({ name: `Donation (${donationCategory})`, price: donationAmount });
+        }
+    }
 
     updateCartDisplay();
 };
