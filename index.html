@@ -55,11 +55,9 @@
             justify-content: center;
             gap: 15px;
         }
-        .donation-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 10px;
+        .missing-field {
+            border: 2px solid red !important;
+            background-color: #ffdddd;
         }
         #paypal-button-container {
             display: flex;
@@ -70,12 +68,47 @@
     <script>
         let cartItems = [];
 
+        function validateFields() {
+            let allValid = true;
+            document.querySelectorAll(".conference-type, .registrant-name, .registrant-institution, .membership-type, .member-name, .member-institution").forEach(field => {
+                if (!field.value.trim()) {
+                    field.classList.add("missing-field");
+                    allValid = false;
+                } else {
+                    field.classList.remove("missing-field");
+                }
+            });
+
+            document.querySelectorAll('input[name="donation-amount"]:checked').forEach(radio => {
+                if (radio.value === "other") {
+                    let otherAmount = document.getElementById("donation-amount");
+                    if (!otherAmount.value.trim() || parseFloat(otherAmount.value) <= 0) {
+                        otherAmount.classList.add("missing-field");
+                        allValid = false;
+                    } else {
+                        otherAmount.classList.remove("missing-field");
+                    }
+                }
+            });
+
+            let donationCategory = document.getElementById("donation-category");
+            if (document.querySelector('input[name="donation-amount"]:checked') && !donationCategory.value.trim()) {
+                donationCategory.classList.add("missing-field");
+                allValid = false;
+            } else {
+                donationCategory.classList.remove("missing-field");
+            }
+
+            return allValid;
+        }
+
         function addRegistration() {
             let container = document.getElementById("registration-container");
             let div = document.createElement("div");
             div.innerHTML = `
                 <h4>Conference Registration</h4>
                 <select class="conference-type" onchange="updateCart()">
+                    <option value="">Select Registration Type</option>
                     <option value="25.00">Individual Member - $25.00</option>
                     <option value="35.00">Individual Non-Member - $35.00</option>
                 </select>
@@ -92,6 +125,7 @@
             div.innerHTML = `
                 <h4>Membership</h4>
                 <select class="membership-type" onchange="updateCart()">
+                    <option value="">Select Membership Type</option>
                     <option value="50.00">24-25 - $50.00</option>
                     <option value="50.00">25-26 - $50.00</option>
                 </select>
@@ -106,37 +140,20 @@
             cartItems = [];
 
             document.querySelectorAll(".conference-type").forEach((select, index) => {
-                let name = document.querySelectorAll(".registrant-name")[index]?.value || "";
-                let institution = document.querySelectorAll(".registrant-institution")[index]?.value || "";
-                cartItems.push({ 
-                    name: `Conference Registration for ${name} (${institution})`, 
-                    price: parseFloat(select.value) 
-                });
+                let name = document.querySelectorAll(".registrant-name")[index]?.value.trim();
+                let institution = document.querySelectorAll(".registrant-institution")[index]?.value.trim();
+                if (select.value && name && institution) {
+                    cartItems.push({ name: `Conference Registration: ${name} (${institution})`, price: parseFloat(select.value) });
+                }
             });
 
             document.querySelectorAll(".membership-type").forEach((select, index) => {
-                let name = document.querySelectorAll(".member-name")[index]?.value || "";
-                let institution = document.querySelectorAll(".member-institution")[index]?.value || "";
-                cartItems.push({ 
-                    name: `Membership for ${name} (${institution})`, 
-                    price: parseFloat(select.value) 
-                });
+                let name = document.querySelectorAll(".member-name")[index]?.value.trim();
+                let institution = document.querySelectorAll(".member-institution")[index]?.value.trim();
+                if (select.value && name && institution) {
+                    cartItems.push({ name: `Membership: ${name} (${institution})`, price: parseFloat(select.value) });
+                }
             });
-
-            let selectedDonation = document.querySelector('input[name="donation-amount"]:checked');
-            let donationAmount = selectedDonation 
-                ? (selectedDonation.value === "other" 
-                    ? parseFloat(document.getElementById("donation-amount").value) || 0 
-                    : parseFloat(selectedDonation.value))
-                : 0;
-            let donationCategory = document.getElementById("donation-category").value;
-
-            if (donationAmount > 0 && donationCategory) {
-                cartItems.push({ 
-                    name: `Donation - ${donationCategory}`, 
-                    price: donationAmount 
-                });
-            }
 
             updateCartDisplay();
         }
@@ -160,7 +177,15 @@
 
             document.getElementById("paypal-button-container").innerHTML = "";
             if (total > 0 && typeof paypal !== "undefined") {
-                paypal.Buttons().render("#paypal-button-container");
+                paypal.Buttons({
+                    onClick: function(data, actions) {
+                        if (!validateFields()) {
+                            alert("Please fill out all required fields before proceeding.");
+                            return actions.reject();
+                        }
+                        return actions.resolve();
+                    }
+                }).render("#paypal-button-container");
             }
         }
 
@@ -183,25 +208,12 @@
     </script>
 </head>
 <body>
-    <img src="https://github.com/joshholmes7/SCAHEAD-PayPal-Payments/blob/main/SC%20AHEAD%20Logo%20Color%202024.png?raw=true" alt="SC AHEAD Logo" class="logo">
     <h2>SC AHEAD Payments Portal</h2>
-
-    <h3>Conference Registrations</h3>
     <button onclick="addRegistration()">Add Registration</button>
     <div id="registration-container"></div>
 
-    <h3>Memberships</h3>
     <button onclick="addMembership()">Add Membership</button>
     <div id="membership-container"></div>
-
-    <h3>Make a Donation</h3>
-    <div class="donation-options">
-        <label><input type="radio" name="donation-amount" value="100" onchange="updateCart()"> $100</label>
-        <label><input type="radio" name="donation-amount" value="500" onchange="updateCart()"> $500</label>
-        <label><input type="radio" name="donation-amount" value="1000" onchange="updateCart()"> $1000</label>
-        <label><input type="radio" name="donation-amount" id="donation-other" value="other" onchange="toggleDonationInput()"> Other</label>
-    </div>
-    <input type="number" id="donation-amount" min="0" placeholder="Enter Amount" onblur="updateCart()" disabled>
 
     <div id="cart"></div>
     <div id="paypal-button-container"></div>
