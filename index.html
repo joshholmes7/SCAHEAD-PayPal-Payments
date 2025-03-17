@@ -261,18 +261,21 @@ window.removeItem = function (index) { // ⬅ Exposing function globally
     .then(data => {
         if (!data.clientId) throw new Error("Invalid PayPal Client ID Response");
 
-        // Prevent duplicate script injection
+        // Check if the script is already loaded
         if (!document.querySelector('script[src*="paypal.com/sdk/js"]')) {
             const script = document.createElement("script");
             script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
-            script.onload = () => window.updateCartDisplay();
+            script.onload = function () {
+                console.log("✅ PayPal SDK Loaded!");
+                setTimeout(window.updateCartDisplay, 500); // Ensure updateCartDisplay runs AFTER PayPal is available
+            };
             document.head.appendChild(script);
         } else {
-            console.log("PayPal script already loaded");
-            window.updateCartDisplay(); // Ensure the buttons load
+            console.log("🚀 PayPal script already loaded");
+            setTimeout(window.updateCartDisplay, 500); // Small delay to ensure PayPal is available
         }
     })
-    .catch(error => console.error("Error loading PayPal SDK:", error));
+    .catch(error => console.error("❌ Error loading PayPal SDK:", error));
     </script>
 </head>
 <body>
