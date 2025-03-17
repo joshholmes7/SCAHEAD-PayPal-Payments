@@ -61,11 +61,6 @@
             gap: 10px;
             margin-top: 10px;
         }
-        #paypal-button-container {
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
     </style>
     <script>
         let cartItems = [];
@@ -123,21 +118,6 @@
                 });
             });
 
-            let selectedDonation = document.querySelector('input[name="donation-amount"]:checked');
-            let donationAmount = selectedDonation 
-                ? (selectedDonation.value === "other" 
-                    ? parseFloat(document.getElementById("donation-amount").value) || 0 
-                    : parseFloat(selectedDonation.value))
-                : 0;
-            let donationCategory = document.getElementById("donation-category").value;
-
-            if (donationAmount > 0 && donationCategory) {
-                cartItems.push({ 
-                    name: `Donation - ${donationCategory}`, 
-                    price: donationAmount 
-                });
-            }
-
             updateCartDisplay();
         }
 
@@ -169,6 +149,7 @@
             updateCartDisplay();
         }
 
+        // Fetch PayPal Client ID from Netlify function
         fetch('/.netlify/functions/getPaypalClientId')
             .then(response => response.json())
             .then(data => {
@@ -202,6 +183,18 @@
         <label><input type="radio" name="donation-amount" id="donation-other" value="other" onchange="toggleDonationInput()"> Other</label>
     </div>
     <input type="number" id="donation-amount" min="0" placeholder="Enter Amount" onblur="updateCart()" disabled>
+
+    <div class="donation-label">
+        <label for="donation-category">Donation Designation:</label>
+        <select id="donation-category" onchange="updateCart()">
+            <option value="">Select Designation</option>
+            <option value="Event Food">Event Food</option>
+            <option value="Event Facilities">Event Facilities</option>
+            <option value="Presenter Fees">Presenter Fees</option>
+            <option value="Annual Business Expenses">Annual Business Expenses</option>
+            <option value="SC AHEAD BOD Discretion">SC AHEAD BOD Discretion</option>
+        </select>
+    </div>
 
     <div id="cart"></div>
     <div id="paypal-button-container"></div>
