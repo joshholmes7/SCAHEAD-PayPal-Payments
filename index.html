@@ -255,13 +255,28 @@ function updateCartDisplay() {
 }).render("#paypal-button-container");
     }
 }
-        function removeItem(index) {
+function removeItem(index) {
     let removedItem = cartItems[index];
-
     cartItems.splice(index, 1);
     updateCartDisplay();
 
-    // If the removed item was a donation, clear donation inputs
+    // **🔥 If the removed item is a Registration, remove its form fields**
+    if (removedItem.name.includes("Conference Registration")) {
+        let registrations = document.querySelectorAll("#registration-container > div");
+        if (registrations.length > 0) {
+            registrations[registrations.length - 1].remove();
+        }
+    }
+
+    // **🔥 If the removed item is a Membership, remove its form fields**
+    if (removedItem.name.includes("Membership")) {
+        let memberships = document.querySelectorAll("#membership-container > div");
+        if (memberships.length > 0) {
+            memberships[memberships.length - 1].remove();
+        }
+    }
+
+    // **🔥 If the removed item is a Donation, clear donation inputs**
     if (removedItem.name.includes("Donation")) {
         document.querySelectorAll('input[name="donation-amount"]').forEach(radio => radio.checked = false);
         document.getElementById("donation-amount").value = "";
