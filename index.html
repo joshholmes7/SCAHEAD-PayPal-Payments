@@ -4,19 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SC AHEAD Payments Portal</title>
-    <script>
-    fetch('/.netlify/functions/getPaypalClientId')
-        .then(response => response.json())
-        .then(data => {
-            if (!data.clientId) throw new Error("Invalid PayPal Client ID Response");
-            
-            const script = document.createElement("script");
-            script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
-            script.onload = () => paypal.Buttons().render("#paypal-button-container");
-            document.head.appendChild(script);
-        })
-        .catch(error => console.error("Error loading PayPal SDK:", error));
-</script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -51,12 +38,6 @@
             display: flex;
             justify-content: center;
             gap: 10px;
-        }
-        .donation-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 10px;
         }
     </style>
     <script>
@@ -176,8 +157,9 @@
             });
 
             cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
+            
             document.getElementById("paypal-button-container").innerHTML = "";
-            if (total > 0) {
+            if (total > 0 && typeof paypal !== "undefined") {
                 paypal.Buttons().render("#paypal-button-container");
             }
         }
@@ -186,6 +168,16 @@
             cartItems.splice(index, 1);
             updateCartDisplay();
         }
+
+        fetch('/.netlify/functions/getPaypalClientId')
+            .then(response => response.json())
+            .then(data => {
+                const script = document.createElement("script");
+                script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
+                script.onload = () => updateCartDisplay();
+                document.head.appendChild(script);
+            })
+            .catch(error => console.error("Error loading PayPal SDK:", error));
     </script>
 </head>
 <body>
