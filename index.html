@@ -201,16 +201,18 @@ function validateFields() {
 
     cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
 
-    document.getElementById("paypal-button-container").innerHTML = "";
+    let paypalContainer = document.getElementById("paypal-button-container");
+    paypalContainer.innerHTML = "";
 
-    if (total > 0 && typeof paypal !== "undefined") {
+    // Ensure PayPal buttons only show when all fields are valid
+    if (total > 0 && typeof paypal !== "undefined" && validateFields()) {
         paypal.Buttons({
             onClick: function (data, actions) {
                 if (!validateFields()) {
                     alert("Please fill out all required fields before proceeding.");
-                    return actions.reject(); // ⛔ Stop PayPal from opening if validation fails
+                    return actions.reject();
                 }
-                return actions.resolve(); // ✅ Allow PayPal to proceed if all fields are valid
+                return actions.resolve();
             }
         }).render("#paypal-button-container");
     }
@@ -254,6 +256,7 @@ function validateFields() {
         <label><input type="radio" name="donation-amount" id="donation-other" value="other" onchange="toggleDonationInput()"> Other</label>
     </div>
     <input type="number" id="donation-amount" min="0" placeholder="Enter Amount" oninput="updateCart()" disabled>
+    <select id="donation-category" onchange="updateCart()">
 
     <div class="donation-label">
         <label for="donation-category">Donation Designation:</label>
