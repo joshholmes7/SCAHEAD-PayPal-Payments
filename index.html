@@ -4,7 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SC AHEAD Payments Portal</title>
-    <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=USD"></script>
+    <script>
+    fetch('/.netlify/functions/getPaypalClientId')
+        .then(response => response.json())
+        .then(data => {
+            if (!data.clientId) throw new Error("Invalid PayPal Client ID Response");
+            
+            const script = document.createElement("script");
+            script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
+            script.onload = () => paypal.Buttons().render("#paypal-button-container");
+            document.head.appendChild(script);
+        })
+        .catch(error => console.error("Error loading PayPal SDK:", error));
+</script>
     <style>
         body {
             font-family: Arial, sans-serif;
