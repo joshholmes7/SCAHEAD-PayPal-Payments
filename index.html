@@ -125,6 +125,20 @@ window.updateCart = function () {
 
     updateCartDisplay();
 };
+window.toggleDonationInput = function () {
+    let otherAmountInput = document.getElementById("donation-amount");
+    let otherRadio = document.getElementById("donation-other");
+
+    if (otherRadio.checked) {
+        otherAmountInput.disabled = false;
+        otherAmountInput.focus(); // Automatically focus on input
+    } else {
+        otherAmountInput.disabled = true;
+        otherAmountInput.value = ""; // Clear input when deselected
+    }
+
+    updateCart();
+};
     window.validateFields = function () { // ⬅ Exposing function globally
         let allValid = true;
 
