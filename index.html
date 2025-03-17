@@ -176,23 +176,25 @@ function validateFields() {
         }
 
         if (selectedDonation.value === "other") {
-            let otherAmount = document.getElementById("donation-amount");
-            if (!otherAmount.value.trim() || parseFloat(otherAmount.value) <= 0) {
-                otherAmount.classList.add("missing-field");
-                allValid = false;
-            } else {
-                otherAmount.classList.remove("missing-field");
-            }
-        }
+    let otherAmount = document.getElementById("donation-amount");
+    if (!otherAmount.value.trim() || parseFloat(otherAmount.value) <= 0) {
+        otherAmount.classList.add("missing-field");
+        allValid = false;
+    } else {
+        otherAmount.classList.remove("missing-field");
     }
+} else {
+    // If a preset amount is selected, remove error styles from "Enter Amount" field
+    document.getElementById("donation-amount").classList.remove("missing-field");
+}
 function toggleDonationInput() {
     let otherAmountInput = document.getElementById("donation-amount");
     let isOtherSelected = document.getElementById("donation-other").checked;
 
-    // Enable input only if "Other" is selected
+    // Enable input if "Other" is selected, disable otherwise
     otherAmountInput.disabled = !isOtherSelected;
 
-    // Clear input when switching away from "Other"
+    // Clear the input when switching away from "Other"
     if (!isOtherSelected) {
         otherAmountInput.value = "";
     }
@@ -251,10 +253,19 @@ function updateCartDisplay() {
     }
 }
         function removeItem(index) {
-            cartItems.splice(index, 1);
-            updateCartDisplay();
-        }
+    let removedItem = cartItems[index];
 
+    cartItems.splice(index, 1);
+    updateCartDisplay();
+
+    // If the removed item was a donation, clear donation inputs
+    if (removedItem.name.includes("Donation")) {
+        document.querySelectorAll('input[name="donation-amount"]').forEach(radio => radio.checked = false);
+        document.getElementById("donation-amount").value = "";
+        document.getElementById("donation-amount").disabled = true;
+        document.getElementById("donation-category").value = "";
+    }
+}
         // Fetch PayPal Client ID from Netlify function
         fetch('/.netlify/functions/getPaypalClientId')
             .then(response => response.json())
