@@ -122,28 +122,35 @@
         }
 
         function updateCartDisplay() {
-            let cartDiv = document.getElementById("cart");
-            cartDiv.innerHTML = "<h3>Shopping Cart</h3>";
+    let cartDiv = document.getElementById("cart");
+    cartDiv.innerHTML = "<h3>Shopping Cart</h3>";
 
-            let total = 0;
-            cartItems.forEach((item, index) => {
-                cartDiv.innerHTML += `
-                    <div class="cart-item">
-                        <span>${item.name}: $${item.price.toFixed(2)}</span>
-                        <button class="remove-btn" onclick="removeItem(${index})">X</button>
-                    </div>
-                `;
-                total += item.price;
-            });
+    let total = 0;
+    cartItems.forEach((item, index) => {
+        cartDiv.innerHTML += `
+            <div class="cart-item">
+                <span>${item.name}: $${item.price.toFixed(2)}</span>
+                <button class="remove-btn" onclick="removeItem(${index})">X</button>
+            </div>
+        `;
+        total += item.price;
+    });
 
-            cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
+    cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
 
-            document.getElementById("paypal-button-container").innerHTML = "";
-            if (total > 0 && typeof paypal !== "undefined") {
-                paypal.Buttons().render("#paypal-button-container");
+    document.getElementById("paypal-button-container").innerHTML = "";
+    if (total > 0 && typeof paypal !== "undefined") {
+        paypal.Buttons({
+            onClick: function (data, actions) {
+                if (!validateFields()) {
+                    alert("Please fill out all required fields before proceeding.");
+                    return actions.reject();
+                }
+                return actions.resolve();
             }
-        }
-
+        }).render("#paypal-button-container");
+    }
+}
         function removeItem(index) {
             cartItems.splice(index, 1);
             updateCartDisplay();
