@@ -61,6 +61,10 @@
             gap: 10px;
             margin-top: 10px;
         }
+        .missing-field {
+    border: 2px solid red !important;
+    background-color: #ffdddd;
+}
     </style>
     <script>
         let cartItems = [];
@@ -120,7 +124,43 @@
 
             updateCartDisplay();
         }
+function validateFields() {
+    let allValid = true;
 
+    // Validate Registrations & Memberships
+    document.querySelectorAll(".conference-type, .registrant-name, .registrant-institution, .membership-type, .member-name, .member-institution").forEach(field => {
+        if (!field.value.trim()) {
+            field.classList.add("missing-field");
+            allValid = false;
+        } else {
+            field.classList.remove("missing-field");
+        }
+    });
+
+    // Validate Donations
+    let selectedDonation = document.querySelector('input[name="donation-amount"]:checked');
+    if (selectedDonation) {
+        let donationCategory = document.getElementById("donation-category");
+        if (!donationCategory.value.trim()) {
+            donationCategory.classList.add("missing-field");
+            allValid = false;
+        } else {
+            donationCategory.classList.remove("missing-field");
+        }
+
+        if (selectedDonation.value === "other") {
+            let otherAmount = document.getElementById("donation-amount");
+            if (!otherAmount.value.trim() || parseFloat(otherAmount.value) <= 0) {
+                otherAmount.classList.add("missing-field");
+                allValid = false;
+            } else {
+                otherAmount.classList.remove("missing-field");
+            }
+        }
+    }
+
+    return allValid;
+}
         function updateCartDisplay() {
     let cartDiv = document.getElementById("cart");
     cartDiv.innerHTML = "<h3>Shopping Cart</h3>";
