@@ -165,6 +165,8 @@ window.updateCart = function () {
 
     // ✅ Ensure `updateCartDisplay` calls `validateFields` correctly
     window.updateCartDisplay = function () {
+    console.log("🔄 Running updateCartDisplay...");
+
     let cartDiv = document.getElementById("cart");
     cartDiv.innerHTML = "<h3>Shopping Cart</h3>";
 
@@ -187,9 +189,11 @@ window.updateCart = function () {
     let paypalContainer = document.getElementById("paypal-button-container");
     paypalContainer.innerHTML = "";
 
-    // **Ensure PayPal is loaded before rendering**
+    console.log("🛒 Cart Total:", total);
+    console.log("💰 PayPal SDK Loaded?", typeof paypal !== "undefined");
+
     if (total > 0 && typeof paypal !== "undefined" && validateFields()) {
-        console.log("Rendering PayPal Buttons...");
+        console.log("✅ Rendering PayPal Buttons...");
         paypal.Buttons({
             createOrder: function (data, actions) {
                 return actions.order.create({
@@ -224,7 +228,7 @@ window.updateCart = function () {
             }
         }).render("#paypal-button-container");
     } else {
-        console.warn("PayPal SDK not loaded yet or no items in cart.");
+        console.warn("⚠️ PayPal SDK not loaded or total is 0.");
     }
 };
 window.removeItem = function (index) { // ⬅ Exposing function globally
