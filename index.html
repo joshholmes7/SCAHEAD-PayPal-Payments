@@ -50,64 +50,63 @@
             max-width: 200px;
             margin-bottom: 20px;
         }
-        .donation-options {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-        .donation-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
     </style>
     <script>
         let cartItems = [];
         let registrations = [];
         let memberships = [];
+        let donations = [];
 
         function addRegistration() {
-            let index = registrations.length;
-            registrations.push({ name: "", institution: "" });
-
             let container = document.getElementById("registration-container");
             let div = document.createElement("div");
             div.innerHTML = `
-                <h4>Conference Registration #${index + 1}</h4>
-                <select class="conference-type" onchange="updateCart()">
+                <h4>Conference Registration</h4>
+                <select class="conference-type" required onchange="updateCart()">
+                    <option value="">Select Registration Type</option>
                     <option value="25.00">Individual Member - $25.00</option>
                     <option value="35.00">Individual Non-Member - $35.00</option>
                 </select>
-                <input type="text" class="registrant-name" placeholder="Name" oninput="updateCart()">
-                <input type="text" class="registrant-institution" placeholder="Institution" oninput="updateCart()">
+                <input type="text" class="registrant-name" placeholder="Name" required oninput="updateCart()">
+                <input type="text" class="registrant-institution" placeholder="Institution" required oninput="updateCart()">
             `;
             container.appendChild(div);
             updateCart();
         }
 
         function addMembership() {
-            let index = memberships.length;
-            memberships.push({ name: "", institution: "" });
-
             let container = document.getElementById("membership-container");
             let div = document.createElement("div");
             div.innerHTML = `
-                <h4>Membership #${index + 1}</h4>
-                <select class="membership-type" onchange="updateCart()">
+                <h4>Membership</h4>
+                <select class="membership-type" required onchange="updateCart()">
+                    <option value="">Select Membership Type</option>
                     <option value="50.00">24-25 - $50.00</option>
                     <option value="50.00">25-26 - $50.00</option>
                 </select>
-                <input type="text" class="member-name" placeholder="Name" oninput="updateCart()">
-                <input type="text" class="member-institution" placeholder="Institution" oninput="updateCart()">
+                <input type="text" class="member-name" placeholder="Name" required oninput="updateCart()">
+                <input type="text" class="member-institution" placeholder="Institution" required oninput="updateCart()">
             `;
             container.appendChild(div);
             updateCart();
         }
 
-        function toggleDonationInput() {
-            let otherInput = document.getElementById("donation-amount");
-            otherInput.disabled = !document.getElementById("donation-other").checked;
+        function addDonation() {
+            let container = document.getElementById("donation-container");
+            let div = document.createElement("div");
+            div.innerHTML = `
+                <h4>Donation</h4>
+                <input type="number" class="donation-amount" min="1" placeholder="Enter Amount" required oninput="updateCart()">
+                <select class="donation-category" required onchange="updateCart()">
+                    <option value="">Select Designation</option>
+                    <option value="Event Food">Event Food</option>
+                    <option value="Event Facilities">Event Facilities</option>
+                    <option value="Presenter Fees">Presenter Fees</option>
+                    <option value="Annual Business Expenses">Annual Business Expenses</option>
+                    <option value="SC AHEAD BOD Discretion">SC AHEAD BOD Discretion</option>
+                </select>
+            `;
+            container.appendChild(div);
             updateCart();
         }
 
@@ -115,38 +114,37 @@
             cartItems = [];
 
             document.querySelectorAll(".conference-type").forEach((select, index) => {
-                let name = document.querySelectorAll(".registrant-name")[index]?.value || "";
-                let institution = document.querySelectorAll(".registrant-institution")[index]?.value || "";
-                cartItems.push({ 
-                    name: `Conference Registration for ${name} (${institution})`, 
-                    price: parseFloat(select.value) 
-                });
+                let name = document.querySelectorAll(".registrant-name")[index]?.value.trim();
+                let institution = document.querySelectorAll(".registrant-institution")[index]?.value.trim();
+                if (select.value && name && institution) {
+                    cartItems.push({ 
+                        name: `Conference Registration for ${name} (${institution})`, 
+                        price: parseFloat(select.value) 
+                    });
+                }
             });
 
             document.querySelectorAll(".membership-type").forEach((select, index) => {
-                let name = document.querySelectorAll(".member-name")[index]?.value || "";
-                let institution = document.querySelectorAll(".member-institution")[index]?.value || "";
-                cartItems.push({ 
-                    name: `Membership for ${name} (${institution})`, 
-                    price: parseFloat(select.value) 
-                });
+                let name = document.querySelectorAll(".member-name")[index]?.value.trim();
+                let institution = document.querySelectorAll(".member-institution")[index]?.value.trim();
+                if (select.value && name && institution) {
+                    cartItems.push({ 
+                        name: `Membership for ${name} (${institution})`, 
+                        price: parseFloat(select.value) 
+                    });
+                }
             });
 
-            let selectedDonation = document.querySelector('input[name="donation-amount"]:checked');
-            let donationAmount = selectedDonation 
-                ? (selectedDonation.value === "other" 
-                    ? parseFloat(document.getElementById("donation-amount").value) || 0 
-                    : parseFloat(selectedDonation.value))
-                : 0;
-
-            let donationCategory = document.getElementById("donation-category").value;
-
-            if (donationAmount > 0) {
-                cartItems.push({ 
-                    name: `Donation - ${donationCategory}`, 
-                    price: donationAmount 
-                });
-            }
+            document.querySelectorAll(".donation-amount").forEach((input, index) => {
+                let amount = parseFloat(input.value) || 0;
+                let category = document.querySelectorAll(".donation-category")[index]?.value;
+                if (amount > 0 && category) {
+                    cartItems.push({ 
+                        name: `Donation - ${category}`, 
+                        price: amount 
+                    });
+                }
+            });
 
             updateCartDisplay();
         }
@@ -167,6 +165,10 @@
             });
 
             cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
+            document.getElementById("paypal-button-container").innerHTML = "";
+            if (total > 0) {
+                paypal.Buttons().render("#paypal-button-container");
+            }
         }
 
         function removeItem(index) {
@@ -176,7 +178,7 @@
     </script>
 </head>
 <body>
-    <img src="https://github.com/joshholmes7/SCAHEAD-PayPal-Payments/blob/main/SC%20AHEAD%20Logo%20Color%202024.png?raw=true" alt="SC AHEAD Logo" class="logo">
+    <img src="logo.png" alt="SC AHEAD Logo" class="logo">
     <h2>SC AHEAD Payments Portal</h2>
 
     <h3>Conference Registrations</h3>
@@ -187,26 +189,11 @@
     <button onclick="addMembership()">Add Membership</button>
     <div id="membership-container"></div>
 
-    <h3>Make a Donation</h3>
-    <div class="donation-options">
-        <label><input type="radio" name="donation-amount" value="100" onchange="updateCart()"> $100</label>
-        <label><input type="radio" name="donation-amount" value="500" onchange="updateCart()"> $500</label>
-        <label><input type="radio" name="donation-amount" value="1000" onchange="updateCart()"> $1000</label>
-        <label><input type="radio" name="donation-amount" id="donation-other" value="other" onchange="toggleDonationInput()"> Other</label>
-    </div>
-    <input type="number" id="donation-amount" min="0" placeholder="Enter Amount" onblur="updateCart()" disabled>
-
-    <div class="donation-label">
-        <label for="donation-category">Donation Designation:</label>
-        <select id="donation-category" onchange="updateCart()">
-            <option value="Event Food">Event Food</option>
-            <option value="Event Facilities">Event Facilities</option>
-            <option value="Presenter Fees">Presenter Fees</option>
-            <option value="Annual Business Expenses">Annual Business Expenses</option>
-            <option value="SC AHEAD BOD Discretion">SC AHEAD BOD Discretion</option>
-        </select>
-    </div>
+    <h3>Donations</h3>
+    <button onclick="addDonation()">Add Donation</button>
+    <div id="donation-container"></div>
 
     <div id="cart"></div>
+    <div id="paypal-button-container"></div>
 </body>
 </html>
