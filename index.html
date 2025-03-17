@@ -187,7 +187,6 @@ function validateFields() {
     // If a preset amount is selected, remove error styles from "Enter Amount" field
     document.getElementById("donation-amount").classList.remove("missing-field");
 }
-function toggleDonationInput() {
     let otherAmountInput = document.getElementById("donation-amount");
     let isOtherSelected = document.getElementById("donation-other").checked;
 
@@ -202,6 +201,20 @@ function toggleDonationInput() {
     updateCart();
 }
     return allValid;
+}
+function toggleDonationInput() {
+    let otherAmountInput = document.getElementById("donation-amount");
+    let isOtherSelected = document.getElementById("donation-other").checked;
+
+    // Enable input if "Other" is selected, disable otherwise
+    otherAmountInput.disabled = !isOtherSelected;
+
+    // Clear the input when switching away from "Other"
+    if (!isOtherSelected) {
+        otherAmountInput.value = ""; // Reset the input value
+    }
+
+    updateCart();
 }
 function updateCartDisplay() {
     let cartDiv = document.getElementById("cart");
