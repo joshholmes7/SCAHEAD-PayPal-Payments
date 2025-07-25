@@ -1,415 +1,351 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SC AHEAD Payments Portal</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 500px;
-            margin: 20px auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        h2, h3 {
-            color: #003366;
-        }
-        input, select, button {
-            width: 100%;
-            padding: 5px;
-            margin-bottom: 10px;
-        }
-        #cart {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background: #f9f9f9;
-            text-align: left;
-        }
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 5px;
-        }
-        .remove-btn {
-            background: red;
-            color: white;
-            border: none;
-            padding: 3px 7px;
-            cursor: pointer;
-            border-radius: 3px;
-            width: auto;
-        }
-        .logo {
-            max-width: 200px;
-            margin-bottom: 20px;
-        }
-        .donation-options {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-        .donation-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .missing-field {
-    border: 2px solid red !important;
-    background-color: #ffdddd;
-}
-#paypal-button-container {
-    display: flex;
-    justify-content: center;
-    align-items: center; /* Ensures vertical centering */
-    margin-top: 20px;
-    width: 100%;
-}
-    </style>
-    <script>
-document.addEventListener("DOMContentLoaded", function () {
-    let cartItems = [];
-window.addRegistration = function () { 
-    let container = document.getElementById("registration-container");
-    let div = document.createElement("div");
-    div.innerHTML = `
-        <h4>Conference Registration</h4>
-        <select class="conference-type" onchange="updateCart()">
-            <option value="25.00">Individual Member - $25.00</option>
-            <option value="35.00">Individual Non-Member - $35.00</option>
-        </select>
-        <input type="text" class="registrant-name" placeholder="Name" oninput="updateCart()">
-        <input type="text" class="registrant-institution" placeholder="Institution" oninput="updateCart()">
-    `;
-    container.appendChild(div);
-    updateCart();
-};
-
-window.addMembership = function () { 
-    let container = document.getElementById("membership-container");
-    let div = document.createElement("div");
-    div.innerHTML = `
-        <h4>Membership</h4>
-        <select class="membership-type" onchange="updateCart()">
-            <option value="50.00">24-25 - $50.00</option>
-            <option value="50.00">25-26 - $50.00</option>
-        </select>
-        <input type="text" class="member-name" placeholder="Name" oninput="updateCart()">
-        <input type="text" class="member-institution" placeholder="Institution" oninput="updateCart()">
-    `;
-    container.appendChild(div);
-    updateCart();
-};
-
-window.addBundle = function () {
-    let container = document.getElementById("bundle-container");
-    let div = document.createElement("div");
-    div.classList.add("bundle-entry");
-
-    div.innerHTML = `
-        <h4>Membership + Fall & Spring Conference Bundle</h4>
-        <select class="bundle-year" onchange="updateCart()">
-            <option value="24-25">24-25 (July 1 - June 30)</option>
-            <option value="25-26">25-26 (July 1 - June 30)</option>
-            <option value="26-27">26-27 (July 1 - June 30)</option>
-            <option value="27-28">27-28 (July 1 - June 30)</option>
-            <option value="28-29">28-29 (July 1 - June 30)</option>
-            <option value="29-30">29-30 (July 1 - June 30)</option>
-        </select>
-        <input type="text" class="bundle-name" placeholder="Member Name" oninput="updateCart()">
-        <input type="text" class="bundle-institution" placeholder="Institution" oninput="updateCart()">
-    `;
-    container.appendChild(div);
-    updateCart();
-};
-
-window.updateCart = function () { 
-    cartItems = [];
-
-    // Add Conference Registrations
-    document.querySelectorAll(".conference-type").forEach((select, index) => {
-        let name = document.querySelectorAll(".registrant-name")[index]?.value || "";
-        let institution = document.querySelectorAll(".registrant-institution")[index]?.value || "";
-        cartItems.push({ name: `Conference Registration for ${name} (${institution})`, price: parseFloat(select.value) });
-    });
-
-    // Add Memberships
-    document.querySelectorAll(".membership-type").forEach((select, index) => {
-        let name = document.querySelectorAll(".member-name")[index]?.value || "";
-        let institution = document.querySelectorAll(".member-institution")[index]?.value || "";
-        cartItems.push({ name: `Membership for ${name} (${institution})`, price: parseFloat(select.value) });
-    });
-
-    // Add Bundles
-    document.querySelectorAll(".bundle-entry").forEach((entry, index) => {
-        let year = entry.querySelector(".bundle-year")?.value || "Unknown Year";
-        let name = entry.querySelector(".bundle-name")?.value || "Unknown Name";
-        let institution = entry.querySelector(".bundle-institution")?.value || "Unknown Institution";
-        cartItems.push({
-        name: `Membership + Fall & Spring Conference ${name} (${institution}) [${year}]`,
-        price: 100.00
-    });
-});
-
-    // ✅ Add Donations
-    let selectedDonation = document.querySelector('input[name="donation-amount"]:checked');
-    if (selectedDonation) {
-        let donationAmount = selectedDonation.value === "other" 
-            ? parseFloat(document.getElementById("donation-amount").value || "0") 
-            : parseFloat(selectedDonation.value);
-
-        let donationCategory = document.getElementById("donation-category").value || "General";
-
-        if (donationAmount > 0) {
-            cartItems.push({ name: `Donation (${donationCategory})`, price: donationAmount });
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SC AHEAD Payments Portal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 500px;
+      margin: 20px auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
     }
-
-    updateCartDisplay();
-};
-window.toggleDonationInput = function () {
-    let otherAmountInput = document.getElementById("donation-amount");
-    let otherRadio = document.getElementById("donation-other");
-
-    if (otherRadio.checked) {
-        otherAmountInput.disabled = false;
-        otherAmountInput.focus(); // Automatically focus on input
-    } else {
-        otherAmountInput.disabled = true;
-        otherAmountInput.value = ""; // Clear input when deselected
+    h2, h3 {
+      color: #003366;
     }
+    input, select, button {
+      width: 100%;
+      padding: 5px;
+      margin-bottom: 10px;
+    }
+    #cart {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background: #f9f9f9;
+      text-align: left;
+    }
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    .remove-btn {
+      background: red;
+      color: white;
+      border: none;
+      padding: 3px 7px;
+      cursor: pointer;
+      border-radius: 3px;
+      width: auto;
+    }
+    .logo {
+      max-width: 200px;
+      margin-bottom: 20px;
+    }
+    .donation-options {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+    .donation-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .missing-field {
+      border: 2px solid red !important;
+      background-color: #ffdddd;
+    }
+    #paypal-button-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 20px;
+      width: 100%;
+    }
+  </style>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      let cartItems = [];
 
-    updateCart();
-};
-    window.validateFields = function () { // ⬅ Exposing function globally
-        let allValid = true;
+      window.addRegistration = function () {
+        const container = document.getElementById("registration-container");
+        const div = document.createElement("div");
+        div.innerHTML = `
+          <h4>Conference Registration</h4>
+          <select class="conference-type" onchange="updateCart()">
+              <option value="25.00">Individual Member - $25.00</option>
+              <option value="35.00">Individual Non-Member - $35.00</option>
+          </select>
+          <input type="text" class="registrant-name" placeholder="Name" oninput="updateCart()">
+          <input type="text" class="registrant-institution" placeholder="Institution" oninput="updateCart()">
+        `;
+        container.appendChild(div);
+        updateCart();
+      };
 
-        // Validate Registrations & Memberships
-        document.querySelectorAll(".conference-type, .registrant-name, .registrant-institution, .membership-type, .member-name, .member-institution").forEach(field => {
-            if (!field.value.trim()) {
-                field.classList.add("missing-field");
-                allValid = false;
-            } else {
-                field.classList.remove("missing-field");
-            }
+      window.addMembership = function () {
+        const container = document.getElementById("membership-container");
+        const div = document.createElement("div");
+        div.innerHTML = `
+          <h4>Membership</h4>
+          <select class="membership-type" onchange="updateCart()">
+              <option value="50.00">24-25 - $50.00</option>
+              <option value="50.00">25-26 - $50.00</option>
+          </select>
+          <input type="text" class="member-name" placeholder="Name" oninput="updateCart()">
+          <input type="text" class="member-institution" placeholder="Institution" oninput="updateCart()">
+        `;
+        container.appendChild(div);
+        updateCart();
+      };
+
+      window.addBundle = function () {
+        const container = document.getElementById("bundle-container");
+        const div = document.createElement("div");
+        div.classList.add("bundle-entry");
+        div.innerHTML = `
+          <h4>Membership + Fall & Spring Conference Bundle</h4>
+          <select class="bundle-year" onchange="updateCart()">
+              <option value="24-25">24-25 (July 1 - June 30)</option>
+              <option value="25-26">25-26 (July 1 - June 30)</option>
+              <option value="26-27">26-27 (July 1 - June 30)</option>
+              <option value="27-28">27-28 (July 1 - June 30)</option>
+              <option value="28-29">28-29 (July 1 - June 30)</option>
+              <option value="29-30">29-30 (July 1 - June 30)</option>
+          </select>
+          <input type="text" class="bundle-name" placeholder="Member Name" oninput="updateCart()">
+          <input type="text" class="bundle-institution" placeholder="Institution" oninput="updateCart()">
+        `;
+        container.appendChild(div);
+        updateCart();
+      };
+
+      window.updateCart = function () {
+        cartItems = [];
+
+        document.querySelectorAll(".conference-type").forEach((select, index) => {
+          const name = document.querySelectorAll(".registrant-name")[index]?.value || "";
+          const institution = document.querySelectorAll(".registrant-institution")[index]?.value || "";
+          cartItems.push({ name: `Conference Registration for ${name} (${institution})`, price: parseFloat(select.value) });
         });
 
-        // Validate Donations
-        let selectedDonation = document.querySelector('input[name="donation-amount"]:checked');
-        if (selectedDonation) {
-            let donationCategory = document.getElementById("donation-category");
-            if (!donationCategory.value.trim()) {
-                donationCategory.classList.add("missing-field");
-                allValid = false;
-            } else {
-                donationCategory.classList.remove("missing-field");
-            }
+        document.querySelectorAll(".membership-type").forEach((select, index) => {
+          const name = document.querySelectorAll(".member-name")[index]?.value || "";
+          const institution = document.querySelectorAll(".member-institution")[index]?.value || "";
+          cartItems.push({ name: `Membership for ${name} (${institution})`, price: parseFloat(select.value) });
+        });
 
-            if (selectedDonation.value === "other") {
-                let otherAmount = document.getElementById("donation-amount");
-                if (!otherAmount.value.trim() || parseFloat(otherAmount.value) <= 0) {
-                    otherAmount.classList.add("missing-field");
-                    allValid = false;
-                } else {
-                    otherAmount.classList.remove("missing-field");
-                }
-            }
+        document.querySelectorAll(".bundle-entry").forEach((entry) => {
+          const year = entry.querySelector(".bundle-year")?.value || "Unknown Year";
+          const name = entry.querySelector(".bundle-name")?.value || "Unknown Name";
+          const institution = entry.querySelector(".bundle-institution")?.value || "Unknown Institution";
+          cartItems.push({
+            name: `Membership + Fall & Spring Conference ${name} (${institution}) [${year}]`,
+            price: 100.00
+          });
+        });
+
+        const selectedDonation = document.querySelector('input[name="donation-amount"]:checked');
+        if (selectedDonation) {
+          const donationAmount = selectedDonation.value === "other"
+            ? parseFloat(document.getElementById("donation-amount").value || "0")
+            : parseFloat(selectedDonation.value);
+
+          const donationCategory = document.getElementById("donation-category").value || "General";
+
+          if (donationAmount > 0) {
+            cartItems.push({ name: `Donation (${donationCategory})`, price: donationAmount });
+          }
         }
 
-        return allValid; // ✅ Ensuring validateFields is properly defined
-    };
+        updateCartDisplay();
+      };
 
-    // ✅ Ensure `updateCartDisplay` calls `validateFields` correctly
-    window.updateCartDisplay = function () {
-    console.log("🔄 Running updateCartDisplay...");
+      window.toggleDonationInput = function () {
+        const otherInput = document.getElementById("donation-amount");
+        const otherRadio = document.getElementById("donation-other");
 
-    let cartDiv = document.getElementById("cart");
-    cartDiv.innerHTML = "<h3>Shopping Cart</h3>";
+        if (otherRadio.checked) {
+          otherInput.disabled = false;
+          otherInput.focus();
+        } else {
+          otherInput.disabled = true;
+          otherInput.value = "";
+        }
 
-    let total = 0;
-    let purchaseDetails = [];
+        updateCart();
+      };
 
-    cartItems.forEach((item, index) => {
-        cartDiv.innerHTML += `
+      window.validateFields = function () {
+        let allValid = true;
+        document.querySelectorAll(".conference-type, .registrant-name, .registrant-institution, .membership-type, .member-name, .member-institution").forEach(field => {
+          if (!field.value.trim()) {
+            field.classList.add("missing-field");
+            allValid = false;
+          } else {
+            field.classList.remove("missing-field");
+          }
+        });
+
+        const selectedDonation = document.querySelector('input[name="donation-amount"]:checked');
+        if (selectedDonation) {
+          const donationCategory = document.getElementById("donation-category");
+          if (!donationCategory.value.trim()) {
+            donationCategory.classList.add("missing-field");
+            allValid = false;
+          } else {
+            donationCategory.classList.remove("missing-field");
+          }
+
+          if (selectedDonation.value === "other") {
+            const otherAmount = document.getElementById("donation-amount");
+            if (!otherAmount.value.trim() || parseFloat(otherAmount.value) <= 0) {
+              otherAmount.classList.add("missing-field");
+              allValid = false;
+            } else {
+              otherAmount.classList.remove("missing-field");
+            }
+          }
+        }
+
+        return allValid;
+      };
+
+      window.updateCartDisplay = function () {
+        const cartDiv = document.getElementById("cart");
+        cartDiv.innerHTML = "<h3>Shopping Cart</h3>";
+        let total = 0;
+        let purchaseDetails = [];
+
+        cartItems.forEach((item, index) => {
+          cartDiv.innerHTML += `
             <div class="cart-item">
-                <span>${item.name}: $${item.price.toFixed(2)}</span>
-                <button class="remove-btn" onclick="removeItem(${index})">X</button>
+              <span>${item.name}: $${item.price.toFixed(2)}</span>
+              <button class="remove-btn" onclick="removeItem(${index})">X</button>
             </div>
-        `;
-        total += item.price;
-        purchaseDetails.push({ name: item.name, price: item.price.toFixed(2) });
-    });
+          `;
+          total += item.price;
+          purchaseDetails.push({ name: item.name, price: item.price.toFixed(2) });
+        });
 
-    cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
+        cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
+        const paypalContainer = document.getElementById("paypal-button-container");
+        if (!paypalContainer) return;
+        paypalContainer.innerHTML = "";
 
-let paypalContainer = document.getElementById("paypal-button-container");
-if (!paypalContainer) {
-    console.error("❌ PayPal container not found in DOM");
-    return;
-}
-paypalContainer.innerHTML = "";
-
-    console.log("🛒 Cart Total:", total);
-    console.log("💰 PayPal SDK Loaded?", typeof paypal !== "undefined");
-
-    if (total > 0 && typeof paypal !== "undefined" && validateFields()) {
-        console.log("✅ Rendering PayPal Buttons...");
-        paypal.Buttons({
+        if (total > 0 && typeof paypal !== "undefined" && validateFields()) {
+          paypal.Buttons({
             createOrder: function (data, actions) {
-                return actions.order.create({
-                    purchase_units: [{
-                        amount: { value: total.toFixed(2) },
-                        description: cartItems.map(item => item.name).join(", "),
-                        custom_id: JSON.stringify(purchaseDetails)
-                    }]
-                });
+              return actions.order.create({
+                purchase_units: [{
+                  amount: { value: total.toFixed(2) },
+                  description: cartItems.map(item => item.name).join(", "),
+                  custom_id: JSON.stringify(purchaseDetails)
+                }]
+              });
             },
             onClick: function (data, actions) {
-                if (!validateFields()) {
-                    alert("Please fill out all required fields before proceeding.");
-                    return actions.reject();
-                }
-                return actions.resolve();
+              if (!validateFields()) {
+                alert("Please fill out all required fields before proceeding.");
+                return actions.reject();
+              }
+              return actions.resolve();
             },
             onApprove: function (data, actions) {
-    return actions.order.capture().then(function (details) {
-        alert("Thank you! Your payment was successfully processed.");
-
-        // ✅ Close the PayPal popup
-        if (window.opener) {
-            window.opener.postMessage("paypal-close", "*");
-            window.close();
+              return actions.order.capture().then(function () {
+                alert("Thank you! Your payment was successfully processed.");
+                cartItems = [];
+                document.getElementById("registration-container").innerHTML = "";
+                document.getElementById("membership-container").innerHTML = "";
+                document.getElementById("bundle-container").innerHTML = "";
+                document.querySelectorAll('input[name="donation-amount"]').forEach(radio => radio.checked = false);
+                document.getElementById("donation-amount").value = "";
+                document.getElementById("donation-amount").disabled = true;
+                document.getElementById("donation-category").value = "";
+                updateCartDisplay();
+              });
+            }
+          }).render("#paypal-button-container");
         }
+      };
 
-        cartItems = [];
-        document.getElementById("registration-container").innerHTML = "";
-        document.getElementById("membership-container").innerHTML = "";
-        document.querySelectorAll('input[name="donation-amount"]').forEach(radio => radio.checked = false);
-        document.getElementById("donation-amount").value = "";
-        document.getElementById("donation-amount").disabled = true;
-        document.getElementById("donation-category").value = "";
-
-        updateCartDisplay();
-    }).catch(function (error) {
-        console.error("❌ Payment Error:", error);
-        alert("An issue occurred while processing your payment.");
-    });
-}
-        }).render("#paypal-button-container");
-    } else {
-        console.warn("⚠️ PayPal SDK not loaded or total is 0.");
-    }
-};
-window.removeItem = function (index) { // ⬅ Exposing function globally
-        let removedItem = cartItems[index];
+      window.removeItem = function (index) {
         cartItems.splice(index, 1);
         updateCartDisplay();
+      };
 
-        if (removedItem.name.includes("Conference Registration")) {
-            let registrations = document.querySelectorAll("#registration-container > div");
-            if (registrations.length > 0) {
-                registrations[registrations.length - 1].remove();
-            }
-        }
+      // ⬇ MOVE PayPal script loading here
+      fetch('/.netlify/functions/getPaypalClientId')
+        .then(response => response.json())
+        .then(data => {
+          if (!data.clientId) throw new Error("Invalid PayPal Client ID");
 
-        if (removedItem.name.includes("Bundle")) {
-            let bundles = document.querySelectorAll("#bundle-container > div");
-            if (bundles.length > 0) {
-                bundles[bundles.length - 1].remove();
-    }
-}
-
-        if (removedItem.name.includes("Membership")) {
-            let memberships = document.querySelectorAll("#membership-container > div");
-            if (memberships.length > 0) {
-                memberships[memberships.length - 1].remove();
-            }
-        }
-
-        if (removedItem.name.includes("Donation")) {
-            document.querySelectorAll('input[name="donation-amount"]').forEach(radio => radio.checked = false);
-            document.getElementById("donation-amount").value = "";
-            document.getElementById("donation-amount").disabled = true;
-            document.getElementById("donation-category").value = "";
-        }
-    };
-
-});
-fetch('/.netlify/functions/getPaypalClientId')
-  .then(response => response.json())
-  .then(data => {
-      if (!data.clientId) throw new Error("Invalid PayPal Client ID Response");
-
-      if (!document.querySelector('script[src*="paypal.com/sdk/js"]')) {
           const script = document.createElement("script");
           script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
-script.onload = function () {
-    console.log("✅ PayPal SDK Loaded!");
-    if (typeof paypal !== "undefined") {
-        window.updateCartDisplay();
-    } else {
-        console.error("❌ PayPal still undefined after script load");
-    }
-};
+          script.onload = function () {
+            console.log("✅ PayPal SDK loaded");
+            setTimeout(() => {
+              if (typeof paypal !== "undefined") updateCartDisplay();
+              else console.error("❌ PayPal still undefined");
+            }, 500);
+          };
           document.head.appendChild(script);
-      } else {
-          console.log("🚀 PayPal script already loaded");
-          setTimeout(window.updateCartDisplay, 500);
-      }
-  })
-  .catch(error => console.error("❌ Error loading PayPal SDK:", error));
-    </script>
+        })
+        .catch(err => console.error("❌ PayPal load failed:", err));
+    });
+  </script>
 </head>
 <body>
-    <img src="https://github.com/joshholmes7/SCAHEAD-PayPal-Payments/blob/main/SC%20AHEAD%20Logo%20Color%202024.png?raw=true" alt="SC AHEAD Logo" class="logo">
-    <h2>SC AHEAD Payments Portal</h2>
+  <img src="https://github.com/joshholmes7/SCAHEAD-PayPal-Payments/blob/main/SC%20AHEAD%20Logo%20Color%202024.png?raw=true" alt="SC AHEAD Logo" class="logo">
+  <h2>SC AHEAD Payments Portal</h2>
 
-    <h3>Conference Registrations</h3>
-    <button onclick="addRegistration()">Add Registration</button>
-    <div id="registration-container"></div>
+  <h3>Conference Registrations</h3>
+  <button onclick="addRegistration()">Add Registration</button>
+  <div id="registration-container"></div>
 
-    <h3>Memberships</h3>
-    <button onclick="addMembership()">Add Membership</button>
-    <div id="membership-container"></div>
+  <h3>Memberships</h3>
+  <button onclick="addMembership()">Add Membership</button>
+  <div id="membership-container"></div>
 
-    <h3>Membership + Conference Bundle</h3>
-    <button onclick="addBundle()">Add Bundle</button>
-    <div id="bundle-container"></div>
+  <h3>Membership + Conference Bundle</h3>
+  <button onclick="addBundle()">Add Bundle</button>
+  <div id="bundle-container"></div>
 
-    <h3>Make a Donation</h3>
-<div class="donation-options">
+  <h3>Make a Donation</h3>
+  <div class="donation-options">
     <label><input type="radio" name="donation-amount" value="100" onchange="updateCart()"> $100</label>
     <label><input type="radio" name="donation-amount" value="500" onchange="updateCart()"> $500</label>
     <label><input type="radio" name="donation-amount" value="1000" onchange="updateCart()"> $1000</label>
     <label><input type="radio" name="donation-amount" id="donation-other" value="other" onchange="toggleDonationInput()"> Other</label>
-</div>
+  </div>
 
-<!-- Custom amount input for "Other" donation -->
-<input type="number" id="donation-amount" min="0" placeholder="Enter Amount" oninput="updateCart()" disabled>
+  <input type="number" id="donation-amount" min="0" placeholder="Enter Amount" oninput="updateCart()" disabled>
 
-<!-- Donation Designation Dropdown -->
-<div class="donation-label">
+  <div class="donation-label">
     <label for="donation-category">Select Designation:</label>
-</div>
-<select id="donation-category" onchange="updateCart()">
+  </div>
+  <select id="donation-category" onchange="updateCart()">
     <option value="" disabled selected>Select Designation</option>
     <option value="Event Food">Event Food</option>
     <option value="Event Facilities">Event Facilities</option>
     <option value="Presenter Fees">Presenter Fees</option>
     <option value="Annual Business Expenses">Annual Business Expenses</option>
     <option value="SC AHEAD BOD Discretion">SC AHEAD BOD Discretion</option>
-</select>
+  </select>
 
-    <div id="cart"></div>
-    <div style="display: flex; justify-content: center;">
+  <div id="cart"></div>
+  <div style="display: flex; justify-content: center;">
     <div id="paypal-button-container"></div>
-</div>
+  </div>
 </body>
 </html>
