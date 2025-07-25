@@ -350,17 +350,14 @@ fetch('/.netlify/functions/getPaypalClientId')
       if (!document.querySelector('script[src*="paypal.com/sdk/js"]')) {
           const script = document.createElement("script");
           script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
-          script.onload = function () {
-              console.log("✅ PayPal SDK Loaded!");
-              setTimeout(() => {
-                  if (typeof paypal !== "undefined") {
-                      console.log("📦 Triggering cart update...");
-                      window.updateCartDisplay();
-                  } else {
-                      console.error("❌ PayPal still undefined after script load");
-                  }
-              }, 500);
-          };
+script.onload = function () {
+    console.log("✅ PayPal SDK Loaded!");
+    if (typeof paypal !== "undefined") {
+        window.updateCartDisplay();
+    } else {
+        console.error("❌ PayPal still undefined after script load");
+    }
+};
           document.head.appendChild(script);
       } else {
           console.log("🚀 PayPal script already loaded");
