@@ -249,8 +249,12 @@ window.toggleDonationInput = function () {
 
     cartDiv.innerHTML += `<strong>Total: $${total.toFixed(2)}</strong>`;
 
-    let paypalContainer = document.getElementById("paypal-button-container");
-    paypalContainer.innerHTML = "";
+let paypalContainer = document.getElementById("paypal-button-container");
+if (!paypalContainer) {
+    console.error("❌ PayPal container not found in DOM");
+    return;
+}
+paypalContainer.innerHTML = "";
 
     console.log("🛒 Cart Total:", total);
     console.log("💰 PayPal SDK Loaded?", typeof paypal !== "undefined");
@@ -338,27 +342,32 @@ window.removeItem = function (index) { // ⬅ Exposing function globally
     };
 
 });
-        // Fetch PayPal Client ID from Netlify function
-        fetch('/.netlify/functions/getPaypalClientId')
-    .then(response => response.json())
-    .then(data => {
-        if (!data.clientId) throw new Error("Invalid PayPal Client ID Response");
+fetch('/.netlify/functions/getPaypalClientId')
+  .then(response => response.json())
+  .then(data => {
+      if (!data.clientId) throw new Error("Invalid PayPal Client ID Response");
 
-        // Check if the script is already loaded
-        if (!document.querySelector('script[src*="paypal.com/sdk/js"]')) {
-            const script = document.createElement("script");
-            script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
-            script.onload = function () {
-                console.log("✅ PayPal SDK Loaded!");
-                setTimeout(window.updateCartDisplay, 500); // Ensure updateCartDisplay runs AFTER PayPal is available
-            };
-            document.head.appendChild(script);
-        } else {
-            console.log("🚀 PayPal script already loaded");
-            setTimeout(window.updateCartDisplay, 500); // Small delay to ensure PayPal is available
-        }
-    })
-    .catch(error => console.error("❌ Error loading PayPal SDK:", error));
+      if (!document.querySelector('script[src*="paypal.com/sdk/js"]')) {
+          const script = document.createElement("script");
+          script.src = `https://www.paypal.com/sdk/js?client-id=${data.clientId}&currency=USD`;
+          script.onload = function () {
+              console.log("✅ PayPal SDK Loaded!");
+              setTimeout(() => {
+                  if (typeof paypal !== "undefined") {
+                      console.log("📦 Triggering cart update...");
+                      window.updateCartDisplay();
+                  } else {
+                      console.error("❌ PayPal still undefined after script load");
+                  }
+              }, 500);
+          };
+          document.head.appendChild(script);
+      } else {
+          console.log("🚀 PayPal script already loaded");
+          setTimeout(window.updateCartDisplay, 500);
+      }
+  })
+  .catch(error => console.error("❌ Error loading PayPal SDK:", error));
     </script>
 </head>
 <body>
